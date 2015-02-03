@@ -7,24 +7,60 @@
 		<div class='panel-heading'>
 			<h4 class='panel-title'>Score</h4>
 		</div>
-		<div class='panel-body'>
-    		<div class='pull-right gameAlerts'>
+		<div class='panel-body game-data-container'>
+
+    		<div class='data-holder scoreData'>
+
+				<h1 class='score'>{{player1.score}} - {{player2.score}}</h1>
+
+				<strong>Leader:</strong>
+
+					<span ng-show='player1.leading'>{{player1.name}}</span>
+					<span ng-show='player2.leading'>{{player2.name}}</span> <br/>
+
+				<strong>Server:</strong>
+
+					<p ng-show='player1.serving'>{{player1.name}}</p>
+					<p ng-show='player2.serving'>{{player2.name}}</p> <br>
+
+				<button class='btn btn-danger' ng-disabled='game.totalScore === 0' ng-click='undoLastPoint()'>Undo Last Point</button> <br/>
+
+    		</div>
+
+    		<div class='data-holder gameAlerts'>
+
     			<div ng-show='game.showSwitchAlert' class="alert alert-info">
-					<strong>Switch!</strong>
+
+					<strong>Switch Servers!</strong>
 					<span ng-click='closeAlert("switch")' class="glyphicon glyphicon-remove pull-right"></span>
-    			</div>
-    			<div ng-show='game.showFaultAlert' class="alert alert-info">
-					<strong>Double Fault!</strong>
-					<span ng-click='closeAlert("fault")' class="glyphicon glyphicon-remove pull-right"></span>
+
     			</div>
 
-    		<span class="label label-danger pull-right" ng-show='game.finalServe'>FINAL SERVE</span>
+    			<div ng-show='game.showFaultAlert' class="alert alert-info">
+
+					<strong>Double Fault!</strong>
+					<span ng-click='closeAlert("fault")' class="glyphicon glyphicon-remove pull-right"></span>
+
+    			</div>
+
+    			<div>
+
+    				<span class="label label-danger" ng-show='game.finalServe'>FINAL SERVE</span>
+
+    			</div>
+
     		</div>
-			<h1 class='score'>{{player1.score}} - {{player2.score}}</h1>
-			<p ng-show='player1.leading'><strong>Leader:</strong> {{player1.name}}</p>
-			<p ng-show='player2.leading'><strong>Leader:</strong> {{player2.name}}</p>
-			<p ng-show='player1.serving'><strong>Server:</strong> {{player1.name}}</p>
-			<p ng-show='player2.serving'><strong>Server:</strong> {{player2.name}}</p>
+
+    		<div class='data-holder streakData'>
+
+    			<div>
+    				<h3>Last Five Points</h3>
+    				<strong>{{game.streakCount.p1Streak}} - </strong>
+    				<strong>{{game.streakCount.p2Streak}}</strong>
+    			</div>
+
+    		</div>
+
 		
 		</div>
 
@@ -46,6 +82,7 @@
 				<p>Points Scored While Serving: {{player1.pointsServing}}</p>
 				<p>Points Scored While Receiving: {{player1.pointsReceiving}}</p>
 				<p>Points Lost To Double Fault: {{player1.ptsDblFaulted}}</p>
+				<p ng-show='player1.streaking'>Point Streak: {{game.streakCount.p1Streak}}</p>
 			</div>
 		</div>
 		<div class='panel-footer'>
@@ -71,17 +108,17 @@
 			</div>
 		
 			<div class='pull-right' ng-show='player2.showPointData'>
-				<h5>{{player2.name}}'s Point Data</h5>
 				<p>Points Scored While Serving: {{player2.pointsServing}}</p>
 				<p>Points Scored While Receiving: {{player2.pointsReceiving}}</p>
 				<p>Points Lost To Double Fault: {{player2.ptsDblFaulted}}</p>
+				<p ng-show='player2.streaking'>Point Streak: {{game.streakCount.p2Streak}}</p>
 			</div>
 		</div>
 		<div class='panel-footer'>
 
 			<button class='btn btn-success' ng-click='point(player2)'>Point</button>
 			<button class='btn btn-warning' ng-click='fault()' ng-show='player2.serving'>Fault</button>
-			<button class='btn btn-info' ng-click='togglePointData(player2)'>Point Data</button>
+			<button class='btn btn-info' ng-click='togglePointData(player2)'>Point Data</button>	
 	
 		</div>
 

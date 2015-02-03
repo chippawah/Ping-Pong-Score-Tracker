@@ -13,7 +13,8 @@ app.controller('mainGamePageCtrl', function($scope, $rootScope, $location){
 		ptsDblFaulted: 0,
 		showPointData: false,
 		playerId: 'p1',
-		leading: false
+		leading: false,
+		streaking: false
 
 	};
 
@@ -28,7 +29,8 @@ app.controller('mainGamePageCtrl', function($scope, $rootScope, $location){
 		ptsDblFaulted: 0,
 		showPointData: false,
 		playerId: 'p2',
-		leading: false
+		leading: false,
+		streaking: false
 
 	};
 
@@ -41,6 +43,14 @@ app.controller('mainGamePageCtrl', function($scope, $rootScope, $location){
 		finalServe: false,
 		showSwitchAlert: false,
 		showFaultAlert: false,
+		lastFivePoints : [],
+		streakCount: {
+
+			p1Streak: 0,
+			p2Streak: 0,
+
+		},
+		lastPoint: undefined
 
 	};
 
@@ -127,24 +137,6 @@ app.controller('mainGamePageCtrl', function($scope, $rootScope, $location){
 
 		};
 
-			//debugger;
-
-			// $scope.game.finalServe = false;
-
-			// $scope.game.serveCounter = 0;
-
-			
-
-			//var scoreDiff = winning.score - losing.score;
-
-			
-
-			// if(scoreDiff === 0) {
-
-			// 	$scope.game.finalServe = true;
-
-			// }
-
 	};
 
 	$scope.gameModeCheck = function() {
@@ -161,23 +153,42 @@ app.controller('mainGamePageCtrl', function($scope, $rootScope, $location){
 
 		};
 
-		if(((p1Score === 20 && p2Score < 20) || (p2Score === 20 && p1Score < 20)) || ((p1Score === 21 && p2Score === 20) || (p1Score === 20 && p2Score === 21))) {
+		if((p1Score === 20 && p2Score < 20) || (p2Score === 20 && p1Score < 20)) {
 
-			//console.log('comeBack mode engaged');
+			// console.log('gameFinishCheck running');	
+
+			// $scope.gameFinishCheck();
 
 			return 'comeBack';
 
 		};
 
+		if((p1Score === 21 && p2Score === 20) || (p1Score === 20 && p2Score === 21)) {
+
+			// console.log('gameFinishCheck running');
+
+			// $scope.gameFinishCheck();
+
+			return 'comeBack';
+		}
+
 		if(p1Score === 20 && p2Score === 20) {
 
+			// console.log('gameFinishCheck running');
+
 			$scope.game.serveCounter = 0;
+
+			// $scope.gameFinishCheck();
 
 			return 'endGame';
 
 		};
 
 		if(p1Score >= 20 && p2Score >= 20) {
+
+			// console.log('gameFinishCheck running');
+
+			// $scope.gameFinishCheck();
 
 			return 'endGame';
 
@@ -305,6 +316,8 @@ app.controller('mainGamePageCtrl', function($scope, $rootScope, $location){
 
 		//debugger;
 
+		$scope.game.lastPoint = player;
+
 		player.score++;
 
 		$scope.game.totalScore++;
@@ -313,9 +326,13 @@ app.controller('mainGamePageCtrl', function($scope, $rootScope, $location){
 
 		$scope.game.showSwitchAlert = false;
 
-		$scope.game.finalServe = false;	
+		$scope.game.finalServe = false;
 
-		$scope.leaderCheck();	
+		$scope.leaderCheck();
+
+		$scope.pointStreakUpdater(player);
+
+		$scope.gameFinishCheck();	
 
 		$scope.pointDataUpdater(player);
 
@@ -391,7 +408,9 @@ app.controller('mainGamePageCtrl', function($scope, $rootScope, $location){
 
 		var p2Score = $scope.player2.score;
 
-		if(!$scope.game.tied) {
+		if((p1Score >= 21 && $scope.player1.leading === true) || (p2Score >= 21 && $scope.player2.leading === true)) {
+
+			debugger;
 
 			var winning = $scope.leaderCheck('winning');
 
@@ -410,4 +429,199 @@ app.controller('mainGamePageCtrl', function($scope, $rootScope, $location){
 
 	};
 
+	$scope.undoLastPoint = function() {
+
+		debugger;
+
+		var player = $scope.game.lastPoint;
+
+		$scope.undoScoreUpdate(player);
+
+		$scope.undoPointStreakUpdate(player);
+
+		$scope.undoPointDataUpdate(player);
+
+		$scope.leaderCheck();
+
+	};
+
+	$scope.undoPointStreakUpdate = function(player){
+
+		var streakArr = $scope.game.lastFivePoints;
+
+			switch (player.playerId) {
+
+				case 'p1':
+
+					$scope.player1.streaking = false;
+
+					$scope.game.streakCount.p1Streak--;
+
+					break;
+
+				case 'p2':
+
+					$scope.player2.streaking = false;
+
+					$scope.game.streakCount.p1Streak--;					
+
+					break;
+
+			};
+		
+		streakArr.shift();
+
+	};
+
+	$scope.undoPointDataUpdate = function(player) {
+
+		var server = $scope.ServerCheck('server');
+
+		var receiver = $scope.ServerCheck('receiver');
+
+		if($scope.game.serveCounter === 0) {
+
+			server.serving = false;
+
+			receiver.serving = true;
+
+			$scope.game.serveCounter = 4;
+
+			$scope.game.finalServe = true;
+
+			$scope.game.showSwitchAlert = false;			
+
+		} else {
+
+			$scope.game.serveCounter--;
+
+			if(player.playerId === server.playerId) {
+
+				server.pointsServing--;
+
+			};
+
+			if(player.playerId === receiver.playerId) {
+
+				receiver.pointsReceiving--
+
+			};
+
+		};
+
+	};
+
+	$scope.pointStreakUpdater = function(player) {
+
+		//debugger;
+
+		var streakArr = $scope.game.lastFivePoints;
+
+		if(streakArr.length === 6) {
+
+			streakArr.pop();
+
+		};
+
+		streakArr.unshift(player.playerId);
+
+		var p1Points = 0;
+
+		var p2Points = 0;
+
+		for (var i = 0; i < 5; i++) {
+			
+			if(streakArr[i] === 'p1') {
+
+				p1Points++;
+
+			};
+
+			if(streakArr[i] === 'p2') {
+
+				p2Points++;
+
+			};
+
+
+		};
+
+		$scope.game.streakCount = {
+
+			p1Streak: p1Points,
+			p2Streak: p2Points
+
+		};
+
+		if(streakArr[0] === streakArr[1]) {
+
+			switch (streakArr[0]) {
+
+				case 'p1':
+
+					$scope.player1.streaking = true;
+
+					$scope.player2.streaking = false;
+
+					break;
+
+				case 'p2':
+
+					$scope.player2.streaking = true;
+
+					$scope.player1.streaking = false;
+
+					break;
+
+			};
+
+		} else {
+
+			$scope.player2.streaking = false;
+
+			$scope.player1.streaking = false;
+
+		};
+
+		if(streakArr.length === 1) {
+
+			switch (streakArr[0]) {
+
+				case 'p1':
+
+					$scope.player1.streaking = true;
+
+					$scope.player2.streaking = false;
+
+					break;
+
+				case 'p2':
+
+					$scope.player2.streaking = true;
+
+					$scope.player1.streaking = false;
+
+					break;
+
+			};
+
+		};
+
+		console.log(streakArr);
+		console.log(p1Points + ' - ' + p2Points);
+
+	};
+
+	$scope.undoScoreUpdate = function(player) {
+
+		$scope.game.totalScore--;
+
+		player.score--;
+
+	}
+
 });
+
+
+
+
