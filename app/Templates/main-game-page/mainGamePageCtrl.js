@@ -1,56 +1,27 @@
 var app = angular.module('scoreKeep');
 
-app.controller('mainGamePageCtrl', function($scope, $rootScope, $location){
+app.controller('mainGamePageCtrl', function($scope, gameDataService, gameId, $location) {
 
-	$scope.player1 = {
+	var player1 = gameDataService.getPlayerData('player1', gameId);
 
-		name: $rootScope.playerNames.player1Name,
-		score: 0,
-		faults: 0,
-		serving: true,
-		pointsReceiving: 0,
-		pointsServing: 0,
-		ptsDblFaulted: 0,
-		showPointData: false,
-		playerId: 'p1',
-		leading: false,
-		streaking: false
+	player1.$bindTo($scope, 'player1');
 
-	};
+	var player2 = gameDataService.getPlayerData('player2', gameId);
+	player2.$bindTo($scope, 'player2');
 
-	$scope.player2 = {
+	var gameObj = gameDataService.getGameObj(gameId);
 
-		name: $rootScope.playerNames.player2Name,
-		score: 0,
-		faults: 0,
-		serving: false,
-		pointsReceiving: 0,
-		pointsServing: 0,
-		ptsDblFaulted: 0,
-		showPointData: false,
-		playerId: 'p2',
-		leading: false,
-		streaking: false
+	gameObj.$bindTo($scope, 'game');
 
-	};
+	$scope.savePlayerName = function(player, name) {
 
-	$scope.game = {
+		debugger;
 
-		totalScore: 0,
-		serveCounter: 0,
-		gamePoint: false,
-		tied: true,
-		finalServe: false,
-		showSwitchAlert: false,
-		showFaultAlert: false,
-		lastFivePoints : [],
-		streakCount: {
+		player.name = name;
 
-			p1Streak: 0,
-			p2Streak: 0,
+		player.showPlayerNameForm = false;
 
-		},
-		lastPoint: undefined
+		console.log(player.name);
 
 	};
 
@@ -314,8 +285,6 @@ app.controller('mainGamePageCtrl', function($scope, $rootScope, $location){
 
 	$scope.point = function(player) {
 
-		//debugger;
-
 		$scope.game.lastPoint = player;
 
 		player.score++;
@@ -380,23 +349,56 @@ app.controller('mainGamePageCtrl', function($scope, $rootScope, $location){
 
 	};
 
-	$scope.togglePointData = function(player) {
+	$scope.toggler = function(prop, player) {
 
-		player.showPointData = !player.showPointData;
+		switch (prop) {
 
-	};
+			case 'fault':
 
-	$scope.closeAlert = function(alert) {
+				$scope.game.showFaultAlert = false;
 
-		if(alert === 'fault') {
+				break;
 
-			$scope.game.showFaultAlert = false;
+			case 'switch':
 
-		};
+				$scope.game.showSwitchAlert = false;
 
-		if(alert === 'switch') {
+				break;
 
-			$scope.game.showSwitchAlert = false;
+			case 'nameForm':
+
+				player.showPlayerNameForm = !player.showPlayerNameForm;
+
+				break;
+
+			case 'pointData':
+
+				player.showPointData = !player.showPointData;
+
+				break;
+
+			case 'serverSelect':
+
+				if(player.playerId === 'p1') {
+
+					$scope.player1.serving = true;
+
+					$scope.player2.serving = false;
+
+				};
+
+				if(player.playerId === 'p2') {
+
+					$scope.player1.serving = false;
+
+					$scope.player2.serving = true;
+
+				};
+
+				console.log('Player1 Serving: ' + player1.serving);
+				console.log('Player2 Serving: ' + player2.serving);
+
+
 
 		};
 
@@ -410,8 +412,6 @@ app.controller('mainGamePageCtrl', function($scope, $rootScope, $location){
 
 		if((p1Score >= 21 && $scope.player1.leading === true) || (p2Score >= 21 && $scope.player2.leading === true)) {
 
-			debugger;
-
 			var winning = $scope.leaderCheck('winning');
 
 			var losing = $scope.leaderCheck('losing');
@@ -420,10 +420,19 @@ app.controller('mainGamePageCtrl', function($scope, $rootScope, $location){
 
 			if(scoreDiff > 1 && winning.score >= 21) {
 
-				alert(winning.name + ' has won the game. The page will now reload...');
+				$scope.game.winner = winning;
 
-				window.location.reload(true);
-			}
+				$scope.game.loser = losing;
+
+				console.log($scope.game.winner, $scope.game.loser);
+
+				gameDataService.saveFinishedGame($scope.player1, $scope.player2, $scope.game);
+
+				gameDataService.sendFinishedGame();
+
+				$location.path('/finishedGames');
+
+			};
 
 		};
 
@@ -495,17 +504,21 @@ app.controller('mainGamePageCtrl', function($scope, $rootScope, $location){
 
 			$scope.game.serveCounter--;
 
-			if(player.playerId === server.playerId) {
+		};
 
-				server.pointsServing--;
+		switch(player.playerId) {
 
-			};
+			case receiver.playerId: 
 
-			if(player.playerId === receiver.playerId) {
+				player.pointsReceiving--;
 
-				receiver.pointsReceiving--
+				break;
 
-			};
+			case server.playerId:
+
+				player.pointsServing--
+
+				break;
 
 		};
 
@@ -583,7 +596,7 @@ app.controller('mainGamePageCtrl', function($scope, $rootScope, $location){
 
 		};
 
-		if(streakArr.length === 1) {
+		if(streakArr.length === 2) {
 
 			switch (streakArr[0]) {
 

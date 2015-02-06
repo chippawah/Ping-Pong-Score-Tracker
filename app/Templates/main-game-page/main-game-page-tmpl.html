@@ -23,11 +23,24 @@
 					<p ng-show='player1.serving'>{{player1.name}}</p>
 					<p ng-show='player2.serving'>{{player2.name}}</p> <br>
 
-				<button class='btn btn-danger' ng-disabled='game.totalScore === 0' ng-click='undoLastPoint()'>Undo Last Point</button> <br/>
-
+				<button class='btn btn-danger' ng-disabled='game.totalScore === 0' ng-click='undoLastPoint()'>Undo Last Point</button>
     		</div>
 
     		<div class='data-holder gameAlerts'>
+
+				<div data-toggle="buttons" ng-show='!game.totalScore'>
+
+					<h4>Server Select</h4>
+
+				    <label class="btn btn-primary" ng-click='toggler("serverSelect", player1)'>
+				        <input type="radio" name="options"> {{player1.name}}
+				    </label>
+
+				    <label class="btn btn-primary" ng-click='toggler("serverSelect", player2)'>
+				        <input type="radio" name="options"> {{player2.name}}
+				    </label>
+
+				</div>
 
     			<div ng-show='game.showSwitchAlert' class="alert alert-info">
 
@@ -69,7 +82,33 @@
 	<div class='panel panel-info'>
 
 		<div class='panel-heading'>
-			<h4 class='panel-title'>{{player1.name}}</h4>
+
+			<h4>
+
+				{{player1.name}}
+
+				<img class='serve-icon' src="Images/ping3.svg" ng-show='player1.serving'>
+
+			</h4>
+
+			<div>
+
+				
+
+			</div>
+
+			<form class="form-inline" ng-show='player1.showPlayerNameForm'>
+
+			    <div class="form-group">
+			        <label class="sr-only">Player 1</label>
+			        <input type="text" class="form-control" ng-model='name1' placeholder="{{player1.name}}">
+			    </div>
+
+			    <button class='btn btn-success' ng-click='savePlayerName(player1, name1)'>Save</button>
+
+			    <button class='btn btn-danger' ng-click='toggler("nameForm", player1)'>Cancel</button>
+
+			</form>
 		</div>
 		<div class='panel-body'>
 			<div class='pull-left'>
@@ -88,8 +127,12 @@
 		<div class='panel-footer'>
 
 			<button class='btn btn-success' ng-click='point(player1)'>Point</button>
+
 			<button class='btn btn-warning' ng-click='fault()' ng-show='player1.serving'>Fault</button>
-			<button class='btn btn-info' ng-click='togglePointData(player1)'>Point Data</button>
+
+			<button class='btn btn-info' ng-click='toggler("pointData", player1)'>Point Data</button>
+
+			<button class='btn btn-info' ng-click='toggler("nameForm", player1)'>Change Player Name</button>
 	
 		</div>
 
@@ -98,7 +141,28 @@
 	<div class='panel panel-info'>
 
 		<div class='panel-heading'>
-			<h4 class='panel-title'>{{player2.name}}</h4>
+
+			<h4>
+
+				{{player2.name}}
+
+				<img class='serve-icon' src="Images/ping3.svg" ng-show='player2.serving'>
+
+			</h4>
+
+			<form class="form-inline" ng-show='player2.showPlayerNameForm'>
+
+			    <div class="form-group">
+			        <label class="sr-only">Player 2</label>
+			        <input type="text" class="form-control" ng-model='name2' placeholder="{{player2.name}}">
+			    </div>
+
+				<button class='btn btn-success' ng-click='savePlayerName(player2, name2)'>Save</button>
+
+			    <button class='btn btn-danger' ng-click='toggler("nameForm", player2)'>Cancel</button>
+
+			</form>
+
 		</div>
 		<div class='panel-body'>
 			<div class='pull-left'>
@@ -117,8 +181,12 @@
 		<div class='panel-footer'>
 
 			<button class='btn btn-success' ng-click='point(player2)'>Point</button>
+
 			<button class='btn btn-warning' ng-click='fault()' ng-show='player2.serving'>Fault</button>
-			<button class='btn btn-info' ng-click='togglePointData(player2)'>Point Data</button>	
+
+			<button class='btn btn-info' ng-click='toggler("pointData", player2)'>Point Data</button>
+
+			<button class='btn btn-info' ng-click='toggler("nameForm", player2)'>Change Player Name</button>
 	
 		</div>
 

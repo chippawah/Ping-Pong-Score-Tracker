@@ -1,0 +1,21 @@
+<h3>Finished Games<h3>
+
+<div ng-repeat="game in finishedGamesArray">
+    <div class='panel panel-primary'>
+
+    	<div class='panel-heading'>
+
+    		<h4>{{game.player1.name}} VS. {{game.player2.name}}</h4>
+    		
+    	</div>
+
+    	<div class='panel-body'>
+
+			<span>Game on: {{game.createdAt.month + 1}} / {{game.createdAt.day}}</span><br>
+	        <span>{{game.player1.name}} <strong>vs</strong> {{game.player2.name}}</span><br>
+	        <span>Score: {{game.game.winner.score}} --- {{game.game.loser.score}}</span><br>
+	        <span>Winner: {{game.game.winner.name}}</span>	    		
+    	</div>
+        
+    </div>
+</div>

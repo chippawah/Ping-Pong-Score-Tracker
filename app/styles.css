@@ -13,3 +13,30 @@
 	padding: 10px;
 
 }
+
+.serve-icon {
+
+	padding: 10px;
+
+}
+
+.footer-button-row {
+
+	margin-bottom: 0;
+	position: absolute;
+	bottom: 5px;
+
+}
+
+.home-page-container {
+
+	height: 300px;
+	position: relative;
+	padding: 10px;
+}
+
+.landing-content {
+
+	height: 50%;
+	position: relative;
+}

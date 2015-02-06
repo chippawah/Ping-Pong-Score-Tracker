@@ -11,8 +11,6 @@
 	</head>
 	<body ng-controller='mainCtrl'>
 
-		<h1>Ping Pong Score Tracker</h1>
-
 		<ng-view></ng-view>
 
 		<script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
@@ -23,10 +21,13 @@
 		<script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.11/angular-route.min.js'></script>
 
 		<script type="text/javascript" src='main/app.js'></script>
+		<script type="text/javascript" src='services/gameDataService.js'></script>
 		<script type="text/javascript" src='services/playerService.js'></script>
+		<script type="text/javascript" src='services/finishedGameDataService.js'></script>
 		<script type="text/javascript" src='main/mainCtrl.js'></script>
 		<script type="text/javascript" src='templates/home-page/homePageCtrl.js'></script>
 		<script type="text/javascript" src='templates/main-game-page/mainGamePageCtrl.js'></script>
+		<script type="text/javascript" src='templates/finished-games-page/finishedGamePageCtrl.js'></script>
 
 	</body>
 </html>

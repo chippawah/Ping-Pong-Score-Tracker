@@ -7,14 +7,39 @@ app.config(function($routeProvider){
 		.when('/game', {
 
 			templateUrl: 'templates/main-game-page/main-game-page-tmpl.html',
-			controller: 'mainGamePageCtrl'
+			controller: 'mainGamePageCtrl',
+			resolve: {
+
+				gameId: function(gameDataService) {
+
+					 return gameDataService.createNewGame();
+
+				}
+
+			}
 
 		})
 
-		.when('/home',{
+		.when('/home', {
 
 			templateUrl: 'templates/home-page/home-page-tmpl.html',
 			controller: 'homePageCtrl'
+
+		})
+
+		.when('/finishedGames', {
+
+			templateUrl: 'templates/finished-games-page/finished-game-page-tmpl.html',
+			controller: 'finishedGamePageCtrl',
+			resolve: {
+
+				finishedGamesArr: function(finishedGameDataService) {
+
+					return finishedGameDataService.getGames();
+					
+				}
+
+			}
 
 		})
 
@@ -23,23 +48,5 @@ app.config(function($routeProvider){
 			redirectTo: '/home'
 
 		})
-
-});
-
-app.run(function($rootScope, $location, playerService){
-
-	$rootScope.$on('$routeChangeStart', function(event, next, current) {
-
-		if(playerService.getPlayerNames()) {
-
-			$location.path('/game');
-
-		} else {
-
-			$location.path('/home');
-
-		};
-
-	});
 
 });

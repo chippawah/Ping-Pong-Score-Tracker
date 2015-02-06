@@ -2,24 +2,20 @@ var app = angular.module('scoreKeep');
 
 app.service('playerService', function($rootScope, $location){
 
-	this.getPlayerNames = function() {
+	this.getPlayerNames = function(player) {
 
-		return $rootScope.playerNames;
+		debugger;
 
-	};
+		switch (player) {
 
-	this.savePlayerNames = function(name1, name2) {
+			case 'player1':
 
+				return playerNames.player1Name;
 
-		$rootScope.playerNames = {
+			case 'player2':
 
-			player1Name: name1,
-			player2Name: name2
-
+				return playerNames.player2Name;
 		};
 
-		$location.path('/game')
-
 	};
-
 });
