@@ -4,26 +4,32 @@ app.config(function($routeProvider){
 
 	$routeProvider
 
+		.when('/home', {
+
+			templateUrl: 'templates/home-page-tmpl.html',
+			controller: 'homePageCtrl'
+
+		})
+
 		.when('/game', {
 
 			templateUrl: 'templates/main-game-page-tmpl.html',
 			controller: 'mainGamePageCtrl',
 			resolve: {
 
-				gameId: function(gameDataService) {
+				gameId: function(gameService) {
 
-					 return gameDataService.createNewGame();
+					 return gameService.createNewGame();
+
+				},
+
+				matchId: function(matchService) {
+
+					 return matchService.createNewMatch();
 
 				}
 
 			}
-
-		})
-
-		.when('/home', {
-
-			templateUrl: 'templates/home-page-tmpl.html',
-			controller: 'homePageCtrl'
 
 		})
 

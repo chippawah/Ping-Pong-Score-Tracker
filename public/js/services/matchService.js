@@ -1,29 +1,61 @@
 var app = angular.module('scoreKeep');
 
-app.service('matchService', function() {
+app.service('matchService', function($firebase, $location, $q) {
 
-	var finishedMatchObj = {
+	var matchArrayRef = new Firebase('https://ping-pong-scorekeep.firebaseio.com/matches');
+
+	var sync = $firebase(matchArrayRef).$asArray();
+
+	var matchObj = {
 		
-		player1Id: null,
-		player1Wins: null,
+		player1Name: null,
+		player1Email: null,
+		player1Wins: 0,
 
-		player2Id: null,
-		player2Wins: null,
+		player2Email: null,
+		player2Name: null,
+		player2Wins: 0,
 
-		matchWinnerId: null,
-		matchLength: null,
+		matchWinnerEmail: null,
+		matchLength: 0,
 
-		gamesArr: [],
+		gamesArr: []
+
+	};
+
+	this.createNewMatch = function() {
+
+		var dfd = $q.defer();
+
+		sync.$add(matchObj).then(function(obj){
+
+			firebaseMatchId = obj.key();
+
+			console.log('New match added with firebase reference of: ' + firebaseMatchId);
+
+			dfd.resolve(firebaseMatchId);
+
+		});
+
+		return dfd.promise;
 
 	};
 
 	this.addGame = function(gameObj) {
 
-		finishedMatchObj.gamesArr.push(gameObj);
+		matchObj.gamesArr.push(gameObj);
 
-		gameWins.push(gameObj.winner);
+		if (gameObj.winner.email === player1Email) {
 
-		if (finishedMatchObj.gamesArr.length === matchLength) {
+			player1Wins++;
+
+		} else if (gameObj.winner.email === player2Email) {
+
+			player2Wins++;
+
+		};
+
+		if (matchObj.gamesArr.length === matchObj.matchLength) {
 
 			var dfd = $q.defer();
 		
@@ -31,7 +63,7 @@ app.service('matchService', function() {
 
 				url: '/api/saveMatch',
 				method: 'POST',
-				data: finishedMatchObj
+				data: matchObj
 
 			})
 				.then(function(res) {
@@ -46,11 +78,27 @@ app.service('matchService', function() {
 
 	};
 
-	this.configureMatch = function(player1Id, player2Id, matchLength) {
+	this.configureMatch = function(playerInfo, matchLength) {
 
-		finishedMatchObj.player1Id = player1Id;
-		finishedMatchObj.player2Id = player2Id;
-		finishedMatchObj.matchLength = matchLength;
+		matchObj.player1Email = playerInfo.p1Email;
+		matchObj.player2Email = playerInfo.p2Email;
+
+		matchObj.player1Name = playerInfo.p1Name;
+		matchObj.player2Name = playerInfo.p2Name;
+
+		matchObj.matchLength = matchLength;
+
+		$location.path('/game');
+
+	};
+
+	this.getMatchObj = function(matchId) {
+
+		var matchObjRef = new Firebase('https://ping-pong-scorekeep.firebaseio.com/matches/' + matchId);
+
+		var matchObj = $firebase(matchObjRef).$asObject();
+
+		return matchObj;
 
 	};
 

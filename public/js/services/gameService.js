@@ -1,12 +1,10 @@
 var app = angular.module('scoreKeep');
 
-app.service('gameDataService', function($firebase, $q, $location, $http){
+app.service('gameService', function($firebase, $q, $location, $http){
 
-	var gameArrayRef = new Firebase('https://ping-pong-scorekeep.firebaseio.com/games');
+	var gamesArrayRef = new Firebase('https://ping-pong-scorekeep.firebaseio.com/games');
 
-	var sync = $firebase(gameArrayRef).$asArray();
-
-	var finishedGameObj = {};
+	var sync = $firebase(gamesArrayRef).$asArray();
 
 	var gameObj = {
 
@@ -35,6 +33,7 @@ app.service('gameDataService', function($firebase, $q, $location, $http){
 		player1: {
 
 			name: 'Player 1',
+			email: null,
 			score: 0,
 			faults: 0,
 			serving: false,
@@ -52,6 +51,7 @@ app.service('gameDataService', function($firebase, $q, $location, $http){
 		player2: {
 
 			name: 'Player 2',
+			email: null,
 			score: 0,
 			faults: 0,
 			serving: false,
@@ -68,8 +68,6 @@ app.service('gameDataService', function($firebase, $q, $location, $http){
 
 	};
 
-	var finishedGameObj = {};
-
 	this.createNewGame = function() {
 
 		var dfd = $q.defer();
@@ -79,6 +77,7 @@ app.service('gameDataService', function($firebase, $q, $location, $http){
 			firebaseGameId = obj.key();
 
 			console.log('New game added with firebase reference of: ' + firebaseGameId);
+
 			dfd.resolve(firebaseGameId);
 
 		});
@@ -87,63 +86,29 @@ app.service('gameDataService', function($firebase, $q, $location, $http){
 
 	};
 
-	this.getNewGameData = function() {
+	this.getNewGame = function() {
 
 		return gameObj;
 
 	};
 
-	this.saveGameData = function(p1Obj, p2Obj, game) {
+	// this.saveGameData = function(p1Obj, p2Obj, game) {
 
-		var indexForGame = sync.keyAt(firebaseGameId);
+	// 	var indexForGame = sync.keyAt(firebaseGameId);
 
-		sync[indexForGame].player1 = p1Obj;
+	// 	sync[indexForGame].player1 = p1Obj;
 
-		sync[indexForGame].player2 = p2Obj;
+	// 	sync[indexForGame].player2 = p2Obj;
 
-		sync[indexForGame].game = game;
+	// 	sync[indexForGame].game = game;
 
-		sync.$save(indexForGame).then(function(obj) {
+	// 	sync.$save(indexForGame).then(function(obj) {
 
-			console.log('Game at position ' + indexForGame + ' has been saved.');
+	// 		console.log('Game at position ' + indexForGame + ' has been saved.');
 
-		});
+	// 	});
 
-	}
-
-	this.saveFinishedGame = function(p1Obj, p2Obj, game) {
-
-		debugger;
-
-		// var dateObj = new Date();
-
-		// var gameDate = {
-
-		// 	day: dateObj.getDate(),
-		// 	month: dateObj.getMonth()
-			
-		// };
-
-		finishedMatchObj = {
-
-			player1: p1Obj,
-			player2: p2Obj,
-			game: game,
-			// createdAt: gameDate
-
-		};
-
-	};
-
-	this.getPlayerData = function(player, gameId) {
-
-		var playerObjRef = new Firebase('https://ping-pong-scorekeep.firebaseio.com/games/' + gameId + '/' + player);
-
-		var playerObj = $firebase(playerObjRef).$asObject();
-
-		return playerObj;	
-
-	};
+	// }
 
 	this.getGameObj = function(gameId) {
 

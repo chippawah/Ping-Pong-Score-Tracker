@@ -4,12 +4,19 @@ app.controller('matchSetupCtrl', function($scope, matchService, playerService, p
 
 	$scope.primaryPlayer = primaryPlayer;
 
-	$scope.submitMatch = function() {
+	$scope.startMatch = function() {
 
-		console.log('Primary player, ' + $scope.primaryPlayer.name + ' id: ' + $scope.primaryPlayer._id);
-		console.log('Secondary player, ' + $scope.secondaryPlayer.name + ' id: ' + $scope.secondaryPlayer._id);
+		var playerInfo = {
 
-		//matchService.configureMatch($scope.primaryPlayer._id, $scope.secondaryPlayer._id, $scope.matchLength);
+			p1Email: $scope.primaryPlayer.email,
+			p2Email: $scope.secondaryPlayer.email,
+
+			p1Name: $scope.primaryPlayer.name,
+			p2Name: $scope.secondaryPlayer.name
+
+		}
+
+		matchService.configureMatch(playerInfo, $scope.matchLength);
 
 	};
 

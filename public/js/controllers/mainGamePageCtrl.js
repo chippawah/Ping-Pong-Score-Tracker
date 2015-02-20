@@ -1,17 +1,22 @@
 var app = angular.module('scoreKeep');
 
-app.controller('mainGamePageCtrl', function($scope, gameDataService, gameId, $location, matchService) {
+app.controller('mainGamePageCtrl', function($scope, gameService, gameId, matchId, $location, matchService, playerService) {
 
-	var player1 = gameDataService.getPlayerData('player1', gameId);
+	var player1 = playerService.getPlayerData('player1', gameId);
 
 	player1.$bindTo($scope, 'player1');
 
-	var player2 = gameDataService.getPlayerData('player2', gameId);
+	var player2 = playerService.getPlayerData('player2', gameId);
+
 	player2.$bindTo($scope, 'player2');
 
-	var gameObj = gameDataService.getGameObj(gameId);
+	var gameObj = gameService.getGameObj(gameId);
 
 	gameObj.$bindTo($scope, 'game');
+
+	var matchObj = matchService.getMatchObj(matchId);
+
+	matchObj.$bindTo($scope, 'match');
 
 	$scope.savePlayerName = function(player, name) {
 
@@ -22,7 +27,6 @@ app.controller('mainGamePageCtrl', function($scope, gameDataService, gameId, $lo
 		console.log(player.name);
 
 	};
-
 
 	$scope.serveCountHandler = function() {
 
@@ -343,7 +347,6 @@ app.controller('mainGamePageCtrl', function($scope, gameDataService, gameId, $lo
 				break;
 
 		};
-
 
 	};
 

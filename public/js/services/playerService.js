@@ -1,6 +1,6 @@
 var app = angular.module('scoreKeep');
 
-app.service('playerService', function($location, $q, $http){
+app.service('playerService', function($location, $q, $http, $firebase){
 
 	this.getAuthedPlayer = function() {
 
@@ -92,6 +92,16 @@ app.service('playerService', function($location, $q, $http){
 			});
 
 		return dfd.promise;
+
+	};
+
+	this.getPlayerData = function(player, gameId) {
+
+		var playerObjRef = new Firebase('https://ping-pong-scorekeep.firebaseio.com/games/' + gameId + '/' + player);
+
+		var playerObj = $firebase(playerObjRef).$asObject();
+
+		return playerObj;	
 
 	};
 

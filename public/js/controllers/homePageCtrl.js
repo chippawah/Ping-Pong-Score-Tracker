@@ -1,6 +1,6 @@
 var app = angular.module('scoreKeep');
 
-app.controller('homePageCtrl', function($scope, $location){
+app.controller('homePageCtrl', function($scope, $location, gameService){
 
 	$scope.newMatch = function() {
 
