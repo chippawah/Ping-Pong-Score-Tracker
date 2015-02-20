@@ -1,0 +1,67 @@
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+      <div class="container">
+        <h1>The Ultimate Ping Pong Score Keeper</h1>
+        <p>Tracks score, faults, server, point streaks, past games, etc.</p>
+        <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more &raquo;</a></p>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- Example row of columns -->
+      <div class="row">
+
+        <div class="col-md-4 home-page-container">
+
+        	<div class='landing-content'>
+
+        		<h2>Start New Match</h2>
+	        	<p>Start a new match. Play either as guests or sign in to track game history!</p>
+
+        	</div>
+
+        	<div class='footer-button-row'>
+
+    				<button class='btn btn-success footer-button' ng-click='newMatch()'>Create New Match</button>
+
+            <button class='btn btn-info footer-button' ng-click='newGuestMatch()'>Play as guest</button>
+
+        	</div>
+
+
+        </div>
+
+        <div class="col-md-4 home-page-container">
+
+          <h2>Table Queue</h2>
+
+          <p>Eventually holds the queue for the table and shows the score of the current game in progress.</p>
+         
+
+       </div>
+
+        <div class="col-md-4 home-page-container">
+
+          <h2>Finished Games</h2>
+          <p>A list of all completed games.</p>
+
+          <div class='footer-button-row'>
+
+         	 <button class='btn btn-info footer-button' ng-click='finishedGamePage()'>Finished Games</button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <hr>
+
+      <footer>
+        <p>&copy; Company 2014</p>
+      </footer>
+    </div>
+
+	
+
