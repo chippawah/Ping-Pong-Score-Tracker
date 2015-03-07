@@ -4,76 +4,93 @@
 
 
 	<div class='panel panel-primary'>
+
 		<div class='panel-heading'>
+			
 			<h4 class='panel-title'>Score</h4>
+
 		</div>
-		<div class='panel-body game-data-container'>
 
-    		<div class='data-holder scoreData'>
+		<div class='panel-body'>
 
-				<h1 class='score'>{{player1.score}} - {{player2.score}}</h1>
+			<div class='game-data-container'>
 
-				<strong>Leader:</strong>
+	    		<div class='data-holder scoreData'>
 
-					<span ng-show='player1.leading'>{{player1.name}}</span>
-					<span ng-show='player2.leading'>{{player2.name}}</span> <br/>
+					<h1 class='score'>{{player1.score}} - {{player2.score}}</h1>
 
-				<strong>Server:</strong>
+					<strong>Leader:</strong>
 
-					<p ng-show='player1.serving'>{{player1.name}}</p>
-					<p ng-show='player2.serving'>{{player2.name}}</p> <br>
+						<span ng-show='player1.leading'>{{player1.name}}</span>
+						<span ng-show='player2.leading'>{{player2.name}}</span> <br/>
 
-				<button class='btn btn-danger' ng-disabled='game.totalScore === 0' ng-click='undoLastPoint()'>Undo Last Point</button>
+					<strong>Server:</strong>
+
+						<p ng-show='player1.serving'>{{player1.name}}</p>
+						<p ng-show='player2.serving'>{{player2.name}}</p> <br>
+
+					<button class='btn btn-danger' ng-disabled='game.totalScore === 0' ng-click='undoLastPoint()'>Undo Last Point</button>
+	    		
+	    		</div>
+
+	    		<div class='data-holder gameAlerts'>
+
+					<div data-toggle="buttons" ng-show='!game.totalScore'>
+
+						<h4>Server Select</h4>
+
+					    <label class="btn btn-primary" ng-click='toggler("serverSelect", player1)'>
+					        <input type="radio" name="options"> {{player1.name}}
+					    </label>
+
+					    <label class="btn btn-primary" ng-click='toggler("serverSelect", player2)'>
+					        <input type="radio" name="options"> {{player2.name}}
+					    </label>
+
+					</div>
+
+	    			<div ng-show='game.showSwitchAlert' class="alert alert-info">
+
+						<strong>Switch Servers!</strong>
+						<span ng-click='closeAlert("switch")' class="glyphicon glyphicon-remove pull-right"></span>
+
+	    			</div>
+
+	    			<div ng-show='game.showFaultAlert' class="alert alert-info">
+
+						<strong>Double Fault!</strong>
+						<span ng-click='closeAlert("fault")' class="glyphicon glyphicon-remove pull-right"></span>
+
+	    			</div>
+
+	    			<div>
+
+	    				<span class="label label-danger" ng-show='game.finalServe'>FINAL SERVE</span>
+
+	    			</div>
+
+	    			<div class='data-holder streakData'>
+
+		    			<div>
+		    				<h3>Last Five Points</h3>
+		    				<strong>{{game.streakCount.p1Streak}} - </strong>
+		    				<strong>{{game.streakCount.p2Streak}}</strong>
+		    			</div>
+
+		    		</div>
+
     		</div>
 
-    		<div class='data-holder gameAlerts'>
+    		<div class='match-data-container'>
 
-				<div data-toggle="buttons" ng-show='!game.totalScore'>
+    			<h3>Match Stats</h3>
 
-					<h4>Server Select</h4>
+    			Player 1 Name: {{match.player1.name}}
+    			Player 2 Name: {{match.player2.name}}
 
-				    <label class="btn btn-primary" ng-click='toggler("serverSelect", player1)'>
-				        <input type="radio" name="options"> {{player1.name}}
-				    </label>
-
-				    <label class="btn btn-primary" ng-click='toggler("serverSelect", player2)'>
-				        <input type="radio" name="options"> {{player2.name}}
-				    </label>
-
-				</div>
-
-    			<div ng-show='game.showSwitchAlert' class="alert alert-info">
-
-					<strong>Switch Servers!</strong>
-					<span ng-click='closeAlert("switch")' class="glyphicon glyphicon-remove pull-right"></span>
-
-    			</div>
-
-    			<div ng-show='game.showFaultAlert' class="alert alert-info">
-
-					<strong>Double Fault!</strong>
-					<span ng-click='closeAlert("fault")' class="glyphicon glyphicon-remove pull-right"></span>
-
-    			</div>
-
-    			<div>
-
-    				<span class="label label-danger" ng-show='game.finalServe'>FINAL SERVE</span>
-
-    			</div>
+    			Game {{match.gameNumber}} of {{match.matchLength}}
 
     		</div>
-
-    		<div class='data-holder streakData'>
-
-    			<div>
-    				<h3>Last Five Points</h3>
-    				<strong>{{game.streakCount.p1Streak}} - </strong>
-    				<strong>{{game.streakCount.p2Streak}}</strong>
-    			</div>
-
-    		</div>
-
 		
 		</div>
 

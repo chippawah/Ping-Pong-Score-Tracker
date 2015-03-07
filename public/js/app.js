@@ -21,11 +21,29 @@ app.config(function($routeProvider){
 
 					 return gameService.createNewGame();
 
-				},
+				}, 
 
 				matchId: function(matchService) {
 
-					 return matchService.createNewMatch();
+					 return matchService.getMatchId();
+
+				}
+
+
+
+			}
+
+		})
+
+		.when('/intermission', {
+
+			templateUrl:'templates/intermission-page-tmpl.html',
+			controller: 'intermissionCtrl',
+			resolve: {
+
+				matchId: function(matchService) {
+
+					 return matchService.getMatchId();
 
 				}
 
@@ -43,6 +61,12 @@ app.config(function($routeProvider){
 
 					return playerService.getAuthedPlayer();
 
+				}, 
+
+				newMatchId: function(matchService) {
+
+					 return matchService.createNewMatch();
+
 				}
 
 			}
@@ -56,15 +80,15 @@ app.config(function($routeProvider){
 
 		})
 
-		.when('/finishedGames', {
+		.when('/finishedMatches', {
 
-			templateUrl: 'templates/finished-game-page-tmpl.html',
-			controller: 'finishedGamePageCtrl',
+			templateUrl: 'templates/finished-match-page-tmpl.html',
+			controller: 'finishedMatchCtrl',
 			resolve: {
 
-				finishedGamesArr: function(finishedGameDataService) {
+				finishedMatchesArr: function(finishedMatchService) {
 
-					return finishedGameDataService.getGames();
+					return finishedMatchService.getFinishedMatches();
 					
 				}
 

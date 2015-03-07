@@ -2,111 +2,76 @@ var app = angular.module('scoreKeep');
 
 app.controller('mainGamePageCtrl', function($scope, gameService, gameId, matchId, $location, matchService, playerService) {
 
-	var player1 = playerService.getPlayerData('player1', gameId);
-
-	player1.$bindTo($scope, 'player1');
-
-	var player2 = playerService.getPlayerData('player2', gameId);
-
-	player2.$bindTo($scope, 'player2');
-
-	var gameObj = gameService.getGameObj(gameId);
-
-	gameObj.$bindTo($scope, 'game');
+// Getting and setting up all the info
 
 	var matchObj = matchService.getMatchObj(matchId);
+	matchObj.$bindTo($scope, 'match').then(function() {
 
-	matchObj.$bindTo($scope, 'match');
+		console.log('Match object after getting binding to game page scope: ',matchObj);
 
-	$scope.savePlayerName = function(player, name) {
+		var player1 = playerService.getPlayerData('player1', gameId);
+		player1.$bindTo($scope, 'player1').then(function(res) {
 
-		player.name = name;
+			$scope.player1.name = matchObj.player1.name;	
+			$scope.player1.email = matchObj.player1.email;
 
-		player.showPlayerNameForm = false;
+		});
+		
+		var player2 = playerService.getPlayerData('player2', gameId);
+		player2.$bindTo($scope, 'player2').then(function(res) {
 
-		console.log(player.name);
+			$scope.player2.name = matchObj.player2.name;
+			$scope.player2.email = matchObj.player2.email;
 
-	};
+		});
 
-	$scope.serveCountHandler = function() {
+		var gameObj = gameService.getGameObj(gameId);
+		gameObj.$bindTo($scope, 'game');
 
-		$scope.game.serveCounter++;
+	});
 
-		var mode = $scope.gameModeCheck();
+// Game Status Methods
 
-		var server = $scope.ServerCheck('server');
+	$scope.gameFinishCheck = function() {
 
-		var receiver = $scope.ServerCheck('receiver');
+		var p1Score = $scope.player1.score;
 
-		switch (mode) {
+		var p2Score = $scope.player2.score;
 
-			case 'normal':
+		if((p1Score >= 21 && $scope.player1.leading === true) || (p2Score >= 21 && $scope.player2.leading === true)) {
 
-				if($scope.game.serveCounter === 4) {
+			var winning = $scope.leaderCheck('winning');
 
-					$scope.game.finalServe = true;
+			var losing = $scope.leaderCheck('losing');
 
-				};
+			var scoreDiff = winning.score - losing.score;
 
-				if($scope.game.serveCounter === 5) {
+			if(scoreDiff > 1 && winning.score >= 21) {
 
-					server.serving = false;
+				var gameObj = {
 
-					receiver.serving = true;
-
-					$scope.game.serveCounter = 0;
-
-					$scope.game.finalServe = false;
-
-					$scope.game.showSwitchAlert = true;
-
-				};
-
-				break;				
-
-			case 'comeBack':
-
-				var winning = $scope.leaderCheck('winning');
-
-				var losing = $scope.leaderCheck('losing');
-
-				if(winning.serving) {
-
-					winning.serving = false;
-
-					losing.serving = true;
-
-					$scope.game.showSwitchAlert = true;
+					totalScore: $scope.game.totalScore,
+					winner: winning,
+					loser: losing
 
 				};
 
-				break;
+				matchService.addGame(gameObj, matchId)
 
-			case 'endGame':
+					.then(function(res) {
 
-				debugger;
+						console.log('addGame has resolved to mainGamePageCtrl');
 
-				$scope.gameFinishCheck();
+						res();
 
-				if($scope.game.serveCounter === 1) {
+					}, function(err) {
 
-					$scope.game.finalServe = true;
+						console.log(err);
 
-				};
+					});
 
-				if($scope.game.serveCounter === 2) {
 
-					server.serving = false;
-
-					receiver.serving = true;
-
-					$scope.game.serveCounter = 0;
-
-					$scope.game.finalServe = false;
-
-					$scope.game.showSwitchAlert = true;
-
-				}
+			};
 
 		};
 
@@ -263,185 +228,9 @@ app.controller('mainGamePageCtrl', function($scope, gameService, gameId, matchId
 		
 	};
 
-	$scope.pointDataUpdater = function(player) {
-
-		var server = $scope.ServerCheck('server');
-
-		var receiver = $scope.ServerCheck('receiver');
-
-		if(player.playerId === server.playerId) {
-
-			server.pointsServing++;
-
-		};
-
-		if(player.playerId === receiver.playerId) {
-
-			receiver.pointsReceiving++
-
-		};
-
-		server.faults = 0;
-
-	};
-
-	$scope.point = function(player) {
-
-		$scope.game.lastPoint = player;
-
-		player.score++;
-
-		$scope.game.totalScore++;
-
-		$scope.game.showFaultAlert = false;
-
-		$scope.game.showSwitchAlert = false;
-
-		$scope.game.finalServe = false;
-
-		$scope.leaderCheck();
-
-		$scope.pointStreakUpdater(player);
-
-		$scope.gameFinishCheck();	
-
-		$scope.pointDataUpdater(player);
-
-		$scope.serveCountHandler();
-
-	};
-
-	$scope.fault = function() {
-
-		var server = $scope.ServerCheck('server');
-
-		var receiver = $scope.ServerCheck('receiver');
-
-		gameMode = $scope.gameModeCheck();
-
-		switch (gameMode) {
-
-			case 'normal':
-			case 'endGame':
-
-				if(server.faults === 0) {
-
-					server.faults++
-
-				} else {
-
-					$scope.game.showFaultAlert = true;
-
-					server.ptsDblFaulted++;
-
-					$scope.point(receiver);
-
-				};
-
-				break;
-
-			case 'comeBack':
-
-				server.faults = 0;
-
-				break;
-
-		};
-
-	};
-
-	$scope.toggler = function(prop, player) {
-
-		switch (prop) {
-
-			case 'fault':
-
-				$scope.game.showFaultAlert = false;
-
-				break;
-
-			case 'switch':
-
-				$scope.game.showSwitchAlert = false;
-
-				break;
-
-			case 'nameForm':
-
-				player.showPlayerNameForm = !player.showPlayerNameForm;
-
-				break;
-
-			case 'pointData':
-
-				player.showPointData = !player.showPointData;
-
-				break;
-
-			case 'serverSelect':
-
-				if(player.playerId === 'p1') {
-
-					$scope.player1.serving = true;
-
-					$scope.player2.serving = false;
-
-				};
-
-				if(player.playerId === 'p2') {
-
-					$scope.player1.serving = false;
-
-					$scope.player2.serving = true;
-
-				};
-
-				console.log('Player1 Serving: ' + player1.serving);
-				console.log('Player2 Serving: ' + player2.serving);
-
-
-
-		};
-
-	};
-
-	$scope.gameFinishCheck = function() {
-
-		var p1Score = $scope.player1.score;
-
-		var p2Score = $scope.player2.score;
-
-		if((p1Score >= 21 && $scope.player1.leading === true) || (p2Score >= 21 && $scope.player2.leading === true)) {
-
-			var winning = $scope.leaderCheck('winning');
-
-			var losing = $scope.leaderCheck('losing');
-
-			var scoreDiff = winning.score - losing.score;
-
-			if(scoreDiff > 1 && winning.score >= 21) {
-
-				var gameObj = {
-
-					totalScore: $scope.game.totalScore,
-					winner: winning,
-					loser: losing
-
-				};
-
-				matchService.addGame(gameObj);				
-
-				$location.path('/finishedGames');
-
-			};
-
-		};
-
-	};
+// Undo Methods
 
 	$scope.undoLastPoint = function() {
-
-		debugger;
 
 		var player = $scope.game.lastPoint;
 
@@ -522,6 +311,182 @@ app.controller('mainGamePageCtrl', function($scope, gameService, gameId, matchId
 				break;
 
 		};
+
+	};
+
+	$scope.undoScoreUpdate = function(player) {
+
+		$scope.game.totalScore--;
+
+		player.score--;
+
+	};
+
+// Game Helpers
+
+	$scope.toggler = function(prop, player) {
+
+		switch (prop) {
+
+			case 'fault':
+
+				$scope.game.showFaultAlert = false;
+
+				break;
+
+			case 'switch':
+
+				$scope.game.showSwitchAlert = false;
+
+				break;
+
+			case 'nameForm':
+
+				player.showPlayerNameForm = !player.showPlayerNameForm;
+
+				break;
+
+			case 'pointData':
+
+				player.showPointData = !player.showPointData;
+
+				break;
+
+			case 'serverSelect':
+
+				if(player.playerId === 'p1') {
+
+					$scope.player1.serving = true;
+
+					$scope.player2.serving = false;
+
+				};
+
+				if(player.playerId === 'p2') {
+
+					$scope.player1.serving = false;
+
+					$scope.player2.serving = true;
+
+				};
+
+		};
+
+	};
+
+	$scope.savePlayerName = function(player, name) {
+
+		player.name = name;
+
+		player.showPlayerNameForm = false;
+
+		console.log(player.name);
+
+	};
+
+	$scope.serveCountHandler = function() {
+
+		$scope.game.serveCounter++;
+
+		var mode = $scope.gameModeCheck();
+
+		var server = $scope.ServerCheck('server');
+
+		var receiver = $scope.ServerCheck('receiver');
+
+		switch (mode) {
+
+			case 'normal':
+
+				if($scope.game.serveCounter === 4) {
+
+					$scope.game.finalServe = true;
+
+				};
+
+				if($scope.game.serveCounter === 5) {
+
+					server.serving = false;
+
+					receiver.serving = true;
+
+					$scope.game.serveCounter = 0;
+
+					$scope.game.finalServe = false;
+
+					$scope.game.showSwitchAlert = true;
+
+				};
+
+				break;				
+
+			case 'comeBack':
+
+				var winning = $scope.leaderCheck('winning');
+
+				var losing = $scope.leaderCheck('losing');
+
+				if(winning.serving) {
+
+					winning.serving = false;
+
+					losing.serving = true;
+
+					$scope.game.showSwitchAlert = true;
+
+				};
+
+				break;
+
+			case 'endGame':
+
+				debugger;
+
+				$scope.gameFinishCheck();
+
+				if($scope.game.serveCounter === 1) {
+
+					$scope.game.finalServe = true;
+
+				};
+
+				if($scope.game.serveCounter === 2) {
+
+					server.serving = false;
+
+					receiver.serving = true;
+
+					$scope.game.serveCounter = 0;
+
+					$scope.game.finalServe = false;
+
+					$scope.game.showSwitchAlert = true;
+
+				}
+
+		};
+
+	};
+
+	$scope.pointDataUpdater = function(player) {
+
+		var server = $scope.ServerCheck('server');
+
+		var receiver = $scope.ServerCheck('receiver');
+
+		if(player.playerId === server.playerId) {
+
+			server.pointsServing++;
+
+		};
+
+		if(player.playerId === receiver.playerId) {
+
+			receiver.pointsReceiving++
+
+		};
+
+		server.faults = 0;
 
 	};
 
@@ -626,13 +591,70 @@ app.controller('mainGamePageCtrl', function($scope, gameService, gameId, matchId
 
 	};
 
-	$scope.undoScoreUpdate = function(player) {
+	$scope.point = function(player) {
 
-		$scope.game.totalScore--;
+		$scope.game.lastPoint = player;
 
-		player.score--;
+		player.score++;
 
-	}
+		$scope.game.totalScore++;
+
+		$scope.game.showFaultAlert = false;
+
+		$scope.game.showSwitchAlert = false;
+
+		$scope.game.finalServe = false;
+
+		$scope.leaderCheck();
+
+		$scope.pointStreakUpdater(player);
+
+		$scope.gameFinishCheck();	
+
+		$scope.pointDataUpdater(player);
+
+		$scope.serveCountHandler();
+
+	};
+
+	$scope.fault = function() {
+
+		var server = $scope.ServerCheck('server');
+
+		var receiver = $scope.ServerCheck('receiver');
+
+		gameMode = $scope.gameModeCheck();
+
+		switch (gameMode) {
+
+			case 'normal':
+			case 'endGame':
+
+				if(server.faults === 0) {
+
+					server.faults++
+
+				} else {
+
+					$scope.game.showFaultAlert = true;
+
+					server.ptsDblFaulted++;
+
+					$scope.point(receiver);
+
+				};
+
+				break;
+
+			case 'comeBack':
+
+				server.faults = 0;
+
+				break;
+
+		};
+
+	};
 
 });
 

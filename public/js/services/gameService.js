@@ -92,24 +92,6 @@ app.service('gameService', function($firebase, $q, $location, $http){
 
 	};
 
-	// this.saveGameData = function(p1Obj, p2Obj, game) {
-
-	// 	var indexForGame = sync.keyAt(firebaseGameId);
-
-	// 	sync[indexForGame].player1 = p1Obj;
-
-	// 	sync[indexForGame].player2 = p2Obj;
-
-	// 	sync[indexForGame].game = game;
-
-	// 	sync.$save(indexForGame).then(function(obj) {
-
-	// 		console.log('Game at position ' + indexForGame + ' has been saved.');
-
-	// 	});
-
-	// }
-
 	this.getGameObj = function(gameId) {
 
 		var gameObjRef = new Firebase('https://ping-pong-scorekeep.firebaseio.com/games/' + gameId + '/game');

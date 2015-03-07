@@ -7,16 +7,17 @@ var LocalStrategy = require('passport-local').Strategy;
 var mongoose = require('mongoose');
 var Player = require('./server-assests/models/playerModel');
 var playerCtrl = require('./server-assests/controllers/playerCtrl');
+var matchCtrl =  require('./server-assests/controllers/matchCtrl');
 var Match = require('./server-assests/models/matchModel');
 var app = express();
 
 // Middleware & Stuff...
 
+mongoose.connect('mongodb://localhost/ScoreKeep');
+
 app.use(bodyParser.json());
 
 app.use(express.static(__dirname+'/public'));
-
-mongoose.connect('mongodb://localhost/ScoreKeep');
 
 app.use(session({
 
@@ -84,8 +85,9 @@ var isAuthed = function(req, res, next) {
 	return next();
 
 };
+// POST REQUESTS
 
-// Endpoints
+app.post('/api/saveMatch', isAuthed, matchCtrl.saveMatch);
 
 app.post('/api/register', function(req, res) {
 
@@ -107,31 +109,16 @@ app.post('/api/register', function(req, res) {
 
 });
 
-app.post('/api/saveMatch', isAuthed, function(req, res) {
-
-	console.log(req.body);
-
-	var finishedMatch = new Match(req.body);
-
-	finishedMatch.save(function(err, match) {
-
-		if (err) {
-
-			return res.status(500).end();
-
-		};
-
-		return res.json(match);
-
-	})
-
-});
 
 app.post('/api/playerLogin', passport.authenticate('local'), function(req, res) {
 	
 	res.status(200).json(req.user);
 
 });
+
+app.post('/api/playerLookup', isAuthed, playerCtrl.findPlayer);
+
+// GET REQUESTS
 
 app.get('/api/logout', function(req, res) {
 
@@ -146,7 +133,5 @@ app.get('/api/getPrimaryUser', isAuthed, function(req, res) {
 	res.json(req.user);
 
 });
-
-app.post('/api/playerLookup', isAuthed, playerCtrl.findPlayer);
 
 app.listen(8080);
