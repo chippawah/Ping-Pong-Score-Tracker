@@ -1,34 +1,10 @@
 var app = angular.module('scoreKeep');
 
-app.controller('mainGamePageCtrl', function($scope, gameService, gameId, matchId, $location, matchService, playerService) {
+app.controller('mainGamePageCtrl', function($scope, gameService, gameId, $location, matchService, playerService, matchObj) {
 
 // Getting and setting up all the info
 
-	var matchObj = matchService.getMatchObj(matchId);
-	matchObj.$bindTo($scope, 'match').then(function() {
-
-		console.log('Match object after getting binding to game page scope: ',matchObj);
-
-		var player1 = playerService.getPlayerData('player1', gameId);
-		player1.$bindTo($scope, 'player1').then(function(res) {
-
-			$scope.player1.name = matchObj.player1.name;	
-			$scope.player1.email = matchObj.player1.email;
-
-		});
-		
-		var player2 = playerService.getPlayerData('player2', gameId);
-		player2.$bindTo($scope, 'player2').then(function(res) {
-
-			$scope.player2.name = matchObj.player2.name;
-			$scope.player2.email = matchObj.player2.email;
-
-		});
-
-		var gameObj = gameService.getGameObj(gameId);
-		gameObj.$bindTo($scope, 'game');
-
-	});
+$scope.matchObj = matchObj;
 
 // Game Status Methods
 

@@ -1,133 +1,84 @@
 var app = angular.module('scoreKeep');
 
+var socket = io.connect('http://localhost:80');
+
 app.service('matchService', function($firebase, $location, $q, $http) {
 
 // Variables
 
-	var matchObj = {
+	var currentMatchId;	
 
-		player1: {
-
-			name: 'player1Name',
-			email: 'player1Email',
-			wins: 0,
-			pointsReceiving: 0,
-			pointsServing: 0,
-			ptsDblFaulted: 0,
-
-		},
-
-		player2: {
-
-			name: 'player2Name',
-			email: 'player2Email',
-			wins: 0,
-			pointsReceiving: 0,
-			pointsServing: 0,
-			ptsDblFaulted: 0,
-
-		},
-
-		winnerEmail: 'winnerEmail',
-		matchLength: 0,
-		gameNumber: 1,
-
-		gamesArr: []
-
-	};
-
-	var firebaseMatchId;
+	var matchObj = {};
 
 // Setup Methods
 
-	var createNewMatch = function() {
+	var configureMatch = function(playerInfo, matchLength) {
 
-		var matchArrayRef = new Firebase('https://ping-pong-scorekeep.firebaseio.com/matches');
-		var sync = $firebase(matchArrayRef).$asArray();
+		var matchObj = {
 
-		var dfd = $q.defer();
+			player1: {
 
-		sync.$add(matchObj).then(function(obj){
+				name: playerInfo.p1Name,
+				email: playerInfo.p1Email,
+				wins: 0
 
-			firebaseMatchId = obj.key();
-			newMatchId = obj.key();
+			},
 
-			dfd.resolve(firebaseMatchId);
+			player2: {
 
-		});
+				name: playerInfo.p2Name,
+				email: playerInfo.p2Email,
+				wins: 0
 
-		return dfd.promise;
+			},
 
-	};
+			winnerEmail: 'winnerEmail',
+			matchLength: matchLength,
+			gameNumber: 1,
 
-	var configureMatch = function(playerInfo, matchLength, matchId) {
+			gamesArr: []
 
-			var newMatchObjRef = new Firebase('https://ping-pong-scorekeep.firebaseio.com/matches/' + matchId);
-			var newMatchObj = $firebase(newMatchObjRef).$asObject();
+		};
 
-			newMatchObj.$loaded(function() {
+		matchObj = gameService.addGames(matchObj, matchLength);
 
-				newMatchObj.player1.email = playerInfo.p1Email;
-				newMatchObj.player2.email = playerInfo.p2Email;
+		createNewMatch(matchObj)
 
-				newMatchObj.player1.name = playerInfo.p1Name;
-				newMatchObj.player2.name = playerInfo.p2Name;
+			.then(function(id) {
 
-				newMatchObj.matchLength = matchLength;
-
-				newMatchObj.$save();
-
+				console.log('New match created with ID: ', id);
+				
 				$location.path('/game');
+
+			}, function(err) {
+
+				console.log('Error from createNewMatch: ', err);
 
 			});
 
 	};
 
-// Get Info Methods
+	var createNewMatch = function(matchObj) {
+		
+		var dfd = q.defer();
 
-	var getMatchId = function() {
+		socket.emit('new match', matchObj, function(id) {
 
-		return firebaseMatchId;
+			if (response.matchId) {
 
-	}
+				console.log('ID from saveMatch: ', response.matchId);
 
-	var getMatchObj = function(matchId) {
+				currentMatchId = response.matchId;
 
-		var firebaseMatchObjRef = new Firebase('https://ping-pong-scorekeep.firebaseio.com/matches/' + matchId);
+				dfd.resolve(response.matchId);
 
-		var firebaseMatchObj = $firebase(firebaseMatchObjRef).$asObject();
+			} else {
 
-		console.log('Match object coming from getMatchObj(): ', firebaseMatchObj);
+				console.log('Error from saveMatch: ', response.error);
 
-		return firebaseMatchObj;
-
-	};
-
-// Save Methods
-
-	var addGame = function(gameObj, matchId) {
-
-		var dfd = $q.defer();
-
-		var currentMatchRef = new Firebase('https://ping-pong-scorekeep.firebaseio.com/matches/' + matchId);
-
-		var currentMatch = $firebase(currentMatchRef).$asObject();
-
-		currentMatch.$loaded(function() {
-
-			currentMatch.gameNumber++;
-
-			if(!currentMatch.gamesArr) {
-
-				currentMatch.gamesArr = [];
+				dfd.reject(response.error);
 
 			};
-			
-			currentMatch.gamesArr.push(gameObj);
-
-			dataUpdate(currentMatch, gameObj);
-
-			matchFinishCheck(currentMatch, dfd);
 
 		});
 
@@ -135,39 +86,70 @@ app.service('matchService', function($firebase, $location, $q, $http) {
 
 	};
 
+// Get Info Methods
+
+	var getCurrentMatch = function() {
+
+		var dfd = q.defer();
+
+		getMatchObj(currentMatchId).then(function(matchObj) {
+
+			dfd.resolve(matchObj);
+
+		}, function(err) {
+
+			dfd.reject(err);
+
+		});
+
+	};
+
+	var getMatchObj = function(matchId) {
+
+		var dfd = q.defer();
+
+		socket.emit('get match', { matchId: matchId }, function(response) {
+
+			if(response.error) {
+
+				console.log('Error coming from getMatchObj: ', response.error);
+
+				dfd.reject(response.error);
+
+			} else {
+
+				console.log('Match object coming from getMatchObj: ', response.matchObj);
+
+				dfd.resolve(response.matchObj);
+
+			};
+
+
+		});
+
+		return dfd.promise;
+
+	};
+
+// Save Methods
+
 	var sendMatch = function(matchObj) {
 
-		console.log('sendMatch is runnning...');
-
-		console.log(matchObj);
+		console.log('sendMatch is runnning with this match: ', matchObj);
 
 		matchObj.createdAt = Date.now();
 
-		var dfd = $q.defer();
-				
-		$http({
+		socket.emit('save match', matchObj);
 
-			url: '/api/saveMatch',
-			method: 'POST',
-			data: matchObj
+	};
 
-		})
+	var updateMatch = function(matchObj) {
 
-			.then(function(matchJSON) {
+		console.log('updateMatch is runnning with this match: ', matchObj);
 
-				console.log('sendMatch promise should resolve with the json for the match.', matchJSON);
+		matchObj.updatedAt = Date.now();
 
-				dfd.resolve(matchJSON);
-
-			}, function(err) {
-
-				console.log(err);
-
-				dfd.reject(err);
-
-			}); 
-
-		return dfd.promise;
+		socket.emit('update match', matchObj);
 
 	};
 
@@ -260,7 +242,7 @@ app.service('matchService', function($firebase, $location, $q, $http) {
 
 	this.createNewMatch = createNewMatch;
 
-	this.addGame = addGame;
+	this.updateMatch = updateMatch;
 
 	this.configureMatch = configureMatch;
 

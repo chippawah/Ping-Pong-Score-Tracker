@@ -17,19 +17,11 @@ app.config(function($routeProvider){
 			controller: 'mainGamePageCtrl',
 			resolve: {
 
-				gameId: function(gameService) {
+				matchObj: function(matchService) {
 
-					 return gameService.createNewGame();
-
-				}, 
-
-				matchId: function(matchService) {
-
-					 return matchService.getMatchId();
+					return matchService.getCurrentMatch();
 
 				}
-
-
 
 			}
 
@@ -41,9 +33,9 @@ app.config(function($routeProvider){
 			controller: 'intermissionCtrl',
 			resolve: {
 
-				matchId: function(matchService) {
+				matchObj: function(matchService) {
 
-					 return matchService.getMatchId();
+					return matchService.getCurrentMatch();
 
 				}
 

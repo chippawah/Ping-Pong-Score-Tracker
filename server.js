@@ -1,5 +1,4 @@
 // Declarations & Set Up...
-var express = require('express');
 var session = require('express-session');
 var bodyParser = require('body-parser');
 var passport = require('passport');
@@ -8,10 +7,30 @@ var mongoose = require('mongoose');
 var Player = require('./server-assests/models/playerModel');
 var playerCtrl = require('./server-assests/controllers/playerCtrl');
 var matchCtrl =  require('./server-assests/controllers/matchCtrl');
+var rethink = require('./server-assests/controllers/rethinkdbCtrl')
 var Match = require('./server-assests/models/matchModel');
+var express = require('express');
 var app = express();
+var http = require('http');
+var server = http.createServer(app);
+var io = require('socket.io').listen(server);
+
 
 // Middleware & Stuff...
+
+server.listen(80);
+
+io.on('connection', function(socket) {
+
+	console.log('Sockets work, ya bish');
+
+	socket.on('new match', rethink.saveMatch);
+
+	socket.on('new player', rethink.registerPlayer);
+
+	socket.on('get match', rethink.getMatch);
+
+});
 
 mongoose.connect('mongodb://localhost/ScoreKeep');
 
@@ -134,4 +153,4 @@ app.get('/api/getPrimaryUser', isAuthed, function(req, res) {
 
 });
 
-app.listen(8080);
+app.listen(8001);

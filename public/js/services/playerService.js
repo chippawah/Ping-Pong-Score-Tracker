@@ -65,31 +65,21 @@ app.service('playerService', function($location, $q, $http, $firebase){
 
 		var dfd = $q.defer();
 
-		$http({
+		socket.emit('playerLookup', email);
 
-			method: 'POST',
-			url: '/api/playerLookup',
-			data: {
+		socket.on('player found', function(player) {
 
-				email: email
+			if (player) {
+
+				dfd.resolve(player);
+
+			} else {
+
+				dfd.reject();
 
 			}
 
 		})
-
-			.then(function(response) {
-
-				console.log('User found with name: ' + response.data.name);
-
-				dfd.resolve(response.data);
-
-			}, function(err) {
-
-				console.log('Error: ' + err);
-
-				dfd.reject(err);
-
-			});
 
 		return dfd.promise;
 
@@ -107,30 +97,19 @@ app.service('playerService', function($location, $q, $http, $firebase){
 
 	this.saveNewPlayer = function(player) {
 
-		var dfd = $q.defer();
+		socket.emit('new player', player, function(response) {
 
-		$http({
+			if (response.error) {
 
-			method: 'POST',
-			url: '/api/register',
-			data: player
+				console.log('Error from saveNewPlayer: ', response.error);
 
-		})
-			.then(function(player) {
+			} else {
 
-				// console.log('New player created with name: ' + player.name);
+				console.log('New player saved with ID: ', response.playerId);
 
-				dfd.resolve(player);
+			};
 
-			}, function(err) {
-
-				console.log('Error! ----> ' + err);
-
-				dfd.reject(err);
-
-			});
-
-		return dfd.promise;
+		});
 
 	}
 	

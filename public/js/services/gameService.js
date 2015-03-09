@@ -1,12 +1,14 @@
 var app = angular.module('scoreKeep');
 
+var socket = io.connect('http://localhost');
+
 app.service('gameService', function($firebase, $q, $location, $http){
 
-	var gamesArrayRef = new Firebase('https://ping-pong-scorekeep.firebaseio.com/games');
-
-	var sync = $firebase(gamesArrayRef).$asArray();
-
 	var gameObj = {
+
+		winner: null,
+		loser: null,
+		gameNumber: null,
 
 		game: {
 
@@ -17,23 +19,19 @@ app.service('gameService', function($firebase, $q, $location, $http){
 			finalServe: false,
 			showSwitchAlert: false,
 			showFaultAlert: false,
-			lastFivePoints : ['playerId'],
+			lastFivePoints: ['playerId'],
 			streakCount: {
 
 				p1Streak: 0,
 				p2Streak: 0,
 
 			},
-			lastPoint: 'player',
-			winner: 'player',
-			loser: 'player'
+			lastPoint: 'player'
 
 		},
 
 		player1: {
 
-			name: 'Player 1',
-			email: null,
 			score: 0,
 			faults: 0,
 			serving: false,
@@ -50,8 +48,6 @@ app.service('gameService', function($firebase, $q, $location, $http){
 
 		player2: {
 
-			name: 'Player 2',
-			email: null,
 			score: 0,
 			faults: 0,
 			serving: false,
@@ -70,19 +66,7 @@ app.service('gameService', function($firebase, $q, $location, $http){
 
 	this.createNewGame = function() {
 
-		var dfd = $q.defer();
-
-		sync.$add(gameObj).then(function(obj){
-
-			firebaseGameId = obj.key();
-
-			console.log('New game added with firebase reference of: ' + firebaseGameId);
-
-			dfd.resolve(firebaseGameId);
-
-		});
-
-		return dfd.promise;
+		socket.emit('new game', gameObj);
 
 	};
 
@@ -92,13 +76,19 @@ app.service('gameService', function($firebase, $q, $location, $http){
 
 	};
 
-	this.getGameObj = function(gameId) {
+	this.addGames = function(matchObj, matchLength) {
 
-		var gameObjRef = new Firebase('https://ping-pong-scorekeep.firebaseio.com/games/' + gameId + '/game');
+		for (var i = 0; i < matchLength; i++) {
 
-		var gameObj = $firebase(gameObjRef).$asObject();
+			var game = gameService.getNewGame();
 
-		return gameObj;
+			game.gameNum = i + 1;
+			
+			matchObj.gamesArr.push(game);
+
+		};
+
+		return matchObj;
 
 	};
 

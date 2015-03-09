@@ -1,6 +1,6 @@
 var app = angular.module('scoreKeep');
 
-app.controller('matchSetupCtrl', function($scope, matchService, playerService, primaryPlayer, newMatchId) {
+app.controller('matchSetupCtrl', function($scope, matchService, playerService, primaryPlayer) {
 
 	$scope.primaryPlayer = primaryPlayer;
 
@@ -16,7 +16,7 @@ app.controller('matchSetupCtrl', function($scope, matchService, playerService, p
 
 		}
 
-		matchService.configureMatch(playerInfo, $scope.matchLength, newMatchId);
+		matchService.configureMatch(playerInfo, $scope.matchLength);
 
 	};
 
@@ -54,15 +54,9 @@ app.controller('matchSetupCtrl', function($scope, matchService, playerService, p
 
 				$scope.secondaryPlayer = player;
 
-				for (var key in player) {
-
-					console.log(key + ': ' + player[key]);
-
-				};
-
 			}, function(err) {
 
-				console.log(err);
+				console.log('No player found with that email found.');
 
 			});
 

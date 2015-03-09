@@ -1,0 +1,27 @@
+2015-03-07T11:53:08.588807000 0.186752s notice: Recursively removing directory /Users/CCantrell/Documents/DevMountain/Class Work/Personal Projects/Ping-Pong-Score-Tracker/rethinkdb_data/tmp
+2015-03-07T11:53:08.591262000 0.189212s notice: Initializing directory /Users/CCantrell/Documents/DevMountain/Class Work/Personal Projects/Ping-Pong-Score-Tracker/rethinkdb_data
+2015-03-07T11:53:08.591382000 0.189326s info: Creating a default database for your convenience. (This is because you ran 'rethinkdb' without 'create', 'serve', or '--join', and the directory '/Users/CCantrell/Documents/DevMountain/Class Work/Personal Projects/Ping-Pong-Score-Tracker/rethinkdb_data' did not already exist or is empty.)
+2015-03-07T11:53:08.591431000 0.189375s notice: Running rethinkdb 1.16.2-1 (CLANG 6.0 (clang-600.0.56))...
+2015-03-07T11:53:08.661033000 0.258979s notice: Running on Darwin 14.1.0 x86_64
+2015-03-07T11:53:08.661094000 0.259038s notice: Loading data from directory /Users/CCantrell/Documents/DevMountain/Class Work/Personal Projects/Ping-Pong-Score-Tracker/rethinkdb_data
+2015-03-07T11:53:10.857110000 2.455171s info: Automatically using cache size of 100 MB
+2015-03-07T11:53:10.857122000 2.455182s warn: Cache size does not leave much memory for server and query overhead (available memory: 516 MB).
+2015-03-07T11:53:10.857128000 2.455189s warn: Cache size is very low and may impact performance.
+2015-03-07T11:53:10.857785000 2.455846s notice: Listening for intracluster connections on port 29015
+2015-03-07T11:53:10.858611000 2.456671s notice: Listening for client driver connections on port 28015
+2015-03-07T11:53:10.858675000 2.456735s notice: Listening for administrative HTTP connections on port 8080
+2015-03-07T11:53:10.858680000 2.456740s notice: Listening on addresses: 127.0.0.1, ::1
+2015-03-07T11:53:10.858684000 2.456744s notice: To fully expose RethinkDB on the network, bind to all addresses by running rethinkdb with the `--bind all` command line option.
+2015-03-07T11:53:10.858687000 2.456747s notice: Server ready, "Chips_MBP_home_xog" b7b62dee-d054-4cd1-a273-572cbf839a3a
+2015-03-08T20:42:32.317048000 0.209310s notice: Running rethinkdb 1.16.2-1 (CLANG 6.0 (clang-600.0.56))...
+2015-03-08T20:42:32.520491000 0.412750s notice: Running on Darwin 14.1.0 x86_64
+2015-03-08T20:42:32.521051000 0.413308s notice: Loading data from directory /Users/CCantrell/Documents/DevMountain/Class Work/Personal Projects/Ping-Pong-Score-Tracker/rethinkdb_data
+2015-03-08T20:42:33.786331000 1.678647s info: Automatically using cache size of 100 MB
+2015-03-08T20:42:33.786340000 1.678656s warn: Cache size does not leave much memory for server and query overhead (available memory: 299 MB).
+2015-03-08T20:42:33.786346000 1.678662s warn: Cache size is very low and may impact performance.
+2015-03-08T20:42:33.786941000 1.679257s notice: Listening for intracluster connections on port 29015
+2015-03-08T20:42:33.788085000 1.680401s notice: Listening for client driver connections on port 28015
+2015-03-08T20:42:33.788276000 1.680592s notice: Listening for administrative HTTP connections on port 8080
+2015-03-08T20:42:33.788277000 1.680593s notice: Listening on addresses: 127.0.0.1, ::1
+2015-03-08T20:42:33.788281000 1.680597s notice: To fully expose RethinkDB on the network, bind to all addresses by running rethinkdb with the `--bind all` command line option.
+2015-03-08T20:42:33.788282000 1.680598s notice: Server ready, "Chips_MBP_home_xog" b7b62dee-d054-4cd1-a273-572cbf839a3a
