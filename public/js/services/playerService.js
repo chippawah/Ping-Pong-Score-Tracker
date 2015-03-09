@@ -65,23 +65,26 @@ app.service('playerService', function($location, $q, $http, $firebase){
 
 		var dfd = $q.defer();
 
-		socket.emit('playerLookup', email);
+		socket.emit('playerLookup', {email: email}, function(response) {
 
-		socket.on('player found', function(player) {
+			if (response.error) {
 
-			if (player) {
+				console.log('Error from playerLookup: ', response.error);
 
-				dfd.resolve(player);
+				dfd.reject(response.error);
 
 			} else {
 
-				dfd.reject();
+				console.log('Player found: ', response.playerId);
 
-			}
+				dfd.resolve(response.playerId);
 
-		})
+			};
+
+		});
 
 		return dfd.promise;
+
 
 	};
 

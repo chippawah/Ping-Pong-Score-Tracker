@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 var q = require('q');
-var bcrypt = require('bcrypt');
+
 
 var schema = mongoose.Schema({
 
@@ -25,48 +25,8 @@ schema.pre('save', function(next) {
 
 	}
 
-	bcrypt.genSalt(12, function(err, salt) {
-
-		if (err) {
-
-			return next(err);
-
-		}
-
-		bcrypt.hash(player.password, salt, function(err, hash) {
-
-			player.password = hash;
-
-			return next();
-
-		});
-
-	});
+	
 
 });
-
-schema.methods.comparePassword = function(pass) {
-
-	var deferred = q.defer();
-
-	bcrypt.compare(pass, this.password, function(err, isMatch) {
-
-		if (err) {
-
-			deferred.reject(err);
-
-		}
-
-		else {
-
-			deferred.resolve(isMatch);
-
-		}
-
-	});
-
-	return deferred.promise;
-
-};
 
 module.exports = mongoose.model('Player', schema);

@@ -3,10 +3,9 @@ var session = require('express-session');
 var bodyParser = require('body-parser');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
-var mongoose = require('mongoose');
 var Player = require('./server-assests/models/playerModel');
 var playerCtrl = require('./server-assests/controllers/playerCtrl');
-var matchCtrl =  require('./server-assests/controllers/matchCtrl');
+var matchCtrl = require('./server-assests/controllers/matchCtrl');
 var rethink = require('./server-assests/controllers/rethinkdbCtrl')
 var Match = require('./server-assests/models/matchModel');
 var express = require('express');
@@ -32,8 +31,6 @@ io.on('connection', function(socket) {
 
 });
 
-mongoose.connect('mongodb://localhost/ScoreKeep');
-
 app.use(bodyParser.json());
 
 app.use(express.static(__dirname+'/public'));
@@ -54,7 +51,11 @@ passport.use(new LocalStrategy({
 
 }, function(username, password, done) {
 
-	Player.findOne({ email: username }).exec().then(function(player) {
+	console.log(username);
+
+	rethink.findPlayer(username).then(function(player) {
+
+		console.log('Player found for pass compare: ', player);
 
 		if (!player) {
 		
@@ -62,13 +63,15 @@ passport.use(new LocalStrategy({
 		
 		}
 		
-		player.comparePassword(password).then(function(isMatch) {
+		playerCtrl.comparePassword(password, player.password).then(function(isMatch) {
+
+			console.log('isMatch: ', isMatch);
 		
 			if (!isMatch) {
 		
 				return done(null, false);
 		
-			}
+			};
 		
 			return done(null, player);
 		
@@ -134,8 +137,6 @@ app.post('/api/playerLogin', passport.authenticate('local'), function(req, res) 
 	res.status(200).json(req.user);
 
 });
-
-app.post('/api/playerLookup', isAuthed, playerCtrl.findPlayer);
 
 // GET REQUESTS
 

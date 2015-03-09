@@ -4,7 +4,7 @@ app.controller('mainGamePageCtrl', function($scope, gameService, gameId, $locati
 
 // Getting and setting up all the info
 
-$scope.matchObj = matchObj;
+console.log(matchObj);
 
 // Game Status Methods
 

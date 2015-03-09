@@ -2,19 +2,7 @@ var r = require('rethinkdb');
 var q = require('q');
 var matches = r.db('scoreKeep').table('matches');
 var players = r.db('scoreKeep').table('players');
-
-var connection = null;
-r.connect( {host: 'localhost', port: 28015}, function(err, conn) {
-
-    if (err) {
-
-    	console.log(err);
-
-    };
-
-    connection = conn;
-
-});
+var bcrypt = require('bcrypt');
 
 var saveMatch = function (matchObj, cb) {
 
@@ -45,25 +33,45 @@ var saveMatch = function (matchObj, cb) {
 
 var registerPlayer = function(playerObj, cb) {
 
-	players.insert(playerObj).run(connection, function(err, result) {
-
-		var resObj = {};
+	bcrypt.genSalt(12, function(err, salt) {
 
 		if (err) {
 
-			console.log('Error from registerPlayer: ', err);
+			return next(err);
 
-			resObj.error = err;
+		}
 
-		} else {
+		bcrypt.hash(playerObj.password, salt, function(err, hash) {
 
-			console.log('Player saved with id: ', JSON.stringify(result.generated_keys));
+			playerObj.password = hash;
 
-			resObj.playerId = result.generated_keys[0];
+			onConnection(function(connection) {
 
-		};
+				players.insert(playerObj).run(connection, function(err, result) {
 
-		cb(resObj);
+					var resObj = {};
+
+					if (err) {
+
+						console.log('Error from registerPlayer: ', err);
+
+						resObj.error = err;
+
+					} else {
+
+						console.log('Player saved with id: ', JSON.stringify(result.generated_keys));
+
+						resObj.playerId = result.generated_keys[0];
+
+					};
+
+					cb(resObj);
+
+				});
+
+			});
+
+		});
 
 	});
 
@@ -71,33 +79,85 @@ var registerPlayer = function(playerObj, cb) {
 
 var getMatch = function(matchId, cb) {
 
-	matches.filter({id: id}).run(connection, function(err, result) {
+	onConnection(function(connection) {
 
-		var resObj = {};
+		matches.filter({id: matchId}).run(connection, function(err, result) {
 
-		if (err) {
+			var resObj = {};
 
-			console.log(err);
+			if (err) {
 
-			resObj.error = err;
+				console.log(err);
 
-		} else {
+				resObj.error = err;
 
-			resObj.matchObj = result;
+			} else {
 
-		};
+				resObj.matchObj = result;
 
+			};
 
-	})
+			cb(resObj);
+
+		});
+
+	});
 
 };
 
+var findPlayer = function(email){		
 
+	var dfd = q.defer();
+
+	onConnection(function(connection){
+
+		players.filter({email: email}).run(connection, function(err, response) {
+
+			if (err) {
+
+				dfd.reject(err);
+
+			} else {
+
+				response.next(function(err, player) {
+
+					dfd.resolve(player);
+
+				});
+
+			};
+
+			connection.close();
+
+		});
+
+	});
+
+	return dfd.promise;
+
+};
+
+var onConnection = function(cb) {
+
+	r.connect( {host: 'localhost', port: 28015, db: 'scoreKeep'}, function(err, conn) {
+
+	    if (err) {
+
+	    	console.log('Connection failed with error: ', err);
+
+	    };
+
+	    cb(conn);
+
+	});
+
+};
 
 module.exports = {
 
 	saveMatch: saveMatch,
 	registerPlayer: registerPlayer,
-	getMatch: getMatch
+	getMatch: getMatch,
+	findPlayer: findPlayer
 
 };
