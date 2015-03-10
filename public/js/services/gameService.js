@@ -8,6 +8,12 @@ app.service('gameService', function($firebase, $q, $location, $http){
 
 		console.log('Game ended');
 
+		socket.emit('game end', finishedGameObj);
+
+		$location.path('/intermission');
+
 	}
+
+	this.endGame = endGame;
 
 });

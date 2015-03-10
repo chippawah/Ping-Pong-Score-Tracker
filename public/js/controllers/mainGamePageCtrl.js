@@ -34,7 +34,7 @@ $scope.player2 = matchObj.gamesArr[matchObj.gameNumber -1].player2;
 
 					game: $scope.game,
 					player1: $scope.player1,
-					player2: scope.player2
+					player2: $scope.player2
 
 				};
 
