@@ -4,16 +4,10 @@ var socket = io.connect('http://localhost');
 
 app.service('gameService', function($firebase, $q, $location, $http){
 
-	this.createNewGame = function() {
+	var endGame = function(finishedGameObj) {
 
-		socket.emit('new game', gameObj);
+		console.log('Game ended');
 
-	};
-
-	this.getNewGame = function() {
-
-		return gameObj;
-
-	};
+	}
 
 });

@@ -2,15 +2,15 @@ var app = angular.module('scoreKeep');
 
 app.controller('mainGamePageCtrl', function($scope, gameService, $location, matchService, playerService, matchObj) {
 
-// Getting and setting up all the info
+// Setting up all the info
 
-console.log(matchObj);
+$scope.match = matchObj;
 
 $scope.game = matchObj.gamesArr[matchObj.gameNumber -1].game;
 
 $scope.player1 = matchObj.gamesArr[matchObj.gameNumber -1].player1;
 
-$scope.player1 = matchObj.gamesArr[matchObj.gameNumber -1].player1;
+$scope.player2 = matchObj.gamesArr[matchObj.gameNumber -1].player2;
 
 // Game Status Methods
 
@@ -30,28 +30,15 @@ $scope.player1 = matchObj.gamesArr[matchObj.gameNumber -1].player1;
 
 			if(scoreDiff > 1 && winning.score >= 21) {
 
-				var gameObj = {
+				var finishedGame = {
 
-					totalScore: $scope.game.totalScore,
-					winner: winning,
-					loser: losing
+					game: $scope.game,
+					player1: $scope.player1,
+					player2: scope.player2
 
 				};
 
-				matchService.addGame(gameObj, matchId)
-
-					.then(function(res) {
-
-						console.log('addGame has resolved to mainGamePageCtrl');
-
-						res();
-
-					}, function(err) {
-
-						console.log(err);
-
-					});
-
+				gameService.endGame(finishedGame);
 
 			};
 
@@ -67,17 +54,11 @@ $scope.player1 = matchObj.gamesArr[matchObj.gameNumber -1].player1;
 
 		if(p1Score < 20 && p2Score < 20) {
 
-			//console.log('normal mode engaged');
-
 			return 'normal';
 
 		};
 
 		if((p1Score === 20 && p2Score < 20) || (p2Score === 20 && p1Score < 20)) {
-
-			// console.log('gameFinishCheck running');	
-
-			// $scope.gameFinishCheck();
 
 			return 'comeBack';
 
@@ -85,30 +66,18 @@ $scope.player1 = matchObj.gamesArr[matchObj.gameNumber -1].player1;
 
 		if((p1Score === 21 && p2Score === 20) || (p1Score === 20 && p2Score === 21)) {
 
-			// console.log('gameFinishCheck running');
-
-			// $scope.gameFinishCheck();
-
 			return 'comeBack';
 		}
 
 		if(p1Score === 20 && p2Score === 20) {
 
-			// console.log('gameFinishCheck running');
-
 			$scope.game.serveCounter = 0;
-
-			// $scope.gameFinishCheck();
 
 			return 'endGame';
 
 		};
 
 		if(p1Score >= 20 && p2Score >= 20) {
-
-			// console.log('gameFinishCheck running');
-
-			// $scope.gameFinishCheck();
 
 			return 'endGame';
 
@@ -272,11 +241,13 @@ $scope.player1 = matchObj.gamesArr[matchObj.gameNumber -1].player1;
 
 			$scope.game.showSwitchAlert = false;			
 
-		} else {
+		} else if ($scope.game.serveCounter === 4) {
 
-			$scope.game.serveCounter--;
+			$scope.game.finalServe = false;
 
 		};
+
+		$scope.game.serveCounter--;
 
 		switch(player.playerId) {
 
@@ -353,16 +324,6 @@ $scope.player1 = matchObj.gamesArr[matchObj.gameNumber -1].player1;
 				};
 
 		};
-
-	};
-
-	$scope.savePlayerName = function(player, name) {
-
-		player.name = name;
-
-		player.showPlayerNameForm = false;
-
-		console.log(player.name);
 
 	};
 
