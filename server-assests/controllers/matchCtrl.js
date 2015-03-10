@@ -1,80 +1,41 @@
-var playerCtrl = require('./playerCtrl');
-var Match = require('./../models/matchModel');
-var q = require('q');
+var gameCtrl = require('./gameCtrl');
 
-module.exports.saveMatch = saveMatch;
+var configureMatch = function(matchInfo) {
 
-function saveMatch(req, res) {
+	var matchObj = {
 
-	// debugger;
+		player1: {
 
-	emailToId(req.body)
+			name: matchInfo.playerInfo.p1Name,
+			id: matchInfo.playerInfo.p1Id,
+			wins: 0
 
-		.then(function(matchObj) {
+		},
 
-			var finishedMatch = new Match(matchObj);
+		player2: {
 
-			finishedMatch.save(function(err, match) {
+			name: matchInfo.playerInfo.p2Name,
+			id: matchInfo.playerInfo.p2Id,
+			wins: 0
 
-				if (err) {
+		},
 
-					console.log('Save match says: ', err);
+		winnerId: 'winnerEmail',
+		matchLength: matchInfo.matchLength,
+		gameNumber: 1,
 
-					return res.status(500).end();
+		gamesArr: []
 
-				};
+	};
 
-				return res.json(match);
+	matchObj = gameCtrl.addGames(matchObj, matchInfo.matchLength);
 
-			});
-
-		});
-
-	
-
-};
-
-var emailToId = function(matchObj) {
-
-	var dfd = q.defer();
-
-	q.all(playerCtrl.getPlayerId(matchObj.player1.email, matchObj.player2.email))
-
-		.then(function(data) {
-
-			matchObj.player1Id = data[0];
-			matchObj.player2Id = data[1];
-
-			if(matchObj.winnerEmail === matchObj.player1.email) {
-
-				matchObj.winnerId = data[0];
-
-			} else if (matchObj.winnerEmail === matchObj.player2.email) {
-
-				matchObj.winnerId = data[1];
-
-			}
-
-			for (var i = 0; i < matchObj.gamesArr.length; i++) {
-
-				if (matchObj.gamesArr[i].winner === matchObj.player1.email) {
-
-					matchObj.gamesArr[i].winner.mongoId = data[0];
-					matchObj.gamesArr[i].loser.mongoId = data[1];
-
-				} else if (matchObj.gamesArr[i].winner === matchObj.player2.email) {
-
-					matchObj.gamesArr[i].winner.mongoId = data[1];
-					matchObj.gamesArr[i].loser.mongoId = data[0];
-
-				};
-			
-			};
-
-			dfd.resolve(matchObj);
-
-	});
-
-	return dfd.promise;
+	return matchObj;
 
 }
+
+module.exports = {
+
+	configureMatch: configureMatch
+
+};

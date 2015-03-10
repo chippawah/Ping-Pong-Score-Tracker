@@ -23,11 +23,15 @@ io.on('connection', function(socket) {
 
 	console.log('Sockets work, ya bish');
 
-	socket.on('new match', rethink.saveMatch);
+	socket.on('new match', rethink.newMatch);
 
 	socket.on('new player', rethink.registerPlayer);
 
 	socket.on('get match', rethink.getMatch);
+
+	socket.on('find player', rethink.findPlayer);
+
+	socket.on('update match', rethink.updateMatch);
 
 });
 
@@ -53,17 +57,17 @@ passport.use(new LocalStrategy({
 
 	console.log(username);
 
-	rethink.findPlayer(username).then(function(player) {
+	rethink.findPlayer(username, function(response) {
 
-		console.log('Player found for pass compare: ', player);
+		console.log('Player found for pass compare: ', response.player);
 
-		if (!player) {
+		if (!response.player) {
 		
 			return done(null, false);
 		
-		}
+		};
 		
-		playerCtrl.comparePassword(password, player.password).then(function(isMatch) {
+		playerCtrl.comparePassword(password, response.player.password).then(function(isMatch) {
 
 			console.log('isMatch: ', isMatch);
 		
@@ -73,7 +77,7 @@ passport.use(new LocalStrategy({
 		
 			};
 		
-			return done(null, player);
+			return done(null, response.player);
 		
 		});
 	
@@ -108,28 +112,6 @@ var isAuthed = function(req, res, next) {
 
 };
 // POST REQUESTS
-
-app.post('/api/saveMatch', isAuthed, matchCtrl.saveMatch);
-
-app.post('/api/register', function(req, res) {
-
-	console.log(req.body);
-
-	var newPlayer = new Player(req.body);
-
-	newPlayer.save(function(err, player) {
-
-		if (err) {
-
-			return res.status(500).end();
-
-		};
-
-		return res.json(player);
-
-	})
-
-});
 
 
 app.post('/api/playerLogin', passport.authenticate('local'), function(req, res) {

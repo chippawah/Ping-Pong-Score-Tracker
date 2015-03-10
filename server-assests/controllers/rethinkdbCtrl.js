@@ -1,35 +1,55 @@
 var r = require('rethinkdb');
 var q = require('q');
+var matchCtrl = require('./matchCtrl');
 var matches = r.db('scoreKeep').table('matches');
 var players = r.db('scoreKeep').table('players');
 var bcrypt = require('bcrypt');
 
-var saveMatch = function (matchObj, cb) {
+var newMatch = function (matchInfo, cb) {
 
-	console.log('Saving this matchObj to rethinkDB: ', matchObj);
+	onConnection(function(connection) {
 
-	var resObj = {};
+		console.log('Creating match with this info: ', matchInfo);
 
-	matches.insert(matchObj).run(connection, function(err, result) {
+		var matchObj = matchCtrl.configureMatch(matchInfo);
 
-		if (err) {
+		var resObj = {};
 
-			resObj.error = err;
+		matches.insert(matchObj).run(connection, function(err, result) {
 
-		} else {
+			if (err) {
 
-			console.log('Match saved with id: ', JSON.stringify(result.generated_keys[0]));
+				resObj.error = err;
 
-			resObj.matchId = result.generated_keys[0];
+				cb(resObj);
 
-		};
+				connection.close();
 
-		cb(resObj);	
+			} else {
+
+				console.log('Match saved with id: ', JSON.stringify(result.generated_keys[0]));
+
+				var id = result.generated_keys[0];
+
+				matches.get(id).run(connection, function (err, match) {
+
+					resObj.matchObj = match;
+
+					console.log('Reponse being sent to match service from newMatch: ', resObj.matchObj);
+
+					cb(resObj);
+
+					connection.close();
+
+				});
+
+			};
+
+		});
 
 	});
 
 };
-
 
 var registerPlayer = function(playerObj, cb) {
 
@@ -67,6 +87,8 @@ var registerPlayer = function(playerObj, cb) {
 
 					cb(resObj);
 
+					connection.close();
+
 				});
 
 			});
@@ -81,59 +103,113 @@ var getMatch = function(matchId, cb) {
 
 	onConnection(function(connection) {
 
-		matches.filter({id: matchId}).run(connection, function(err, result) {
+		matches.filter({id: matchId})
 
-			var resObj = {};
+			.run(connection, function(err, result) {
 
-			if (err) {
+				var resObj = {};
 
-				console.log(err);
+				if (err) {
 
-				resObj.error = err;
+					console.log(err);
 
-			} else {
+					resObj.error = err;
 
-				resObj.matchObj = result;
+				} else {
 
-			};
+					resObj.matchObj = result;
 
-			cb(resObj);
+				};
 
-		});
+				cb(resObj);
+
+				connection.close();
+
+			});
 
 	});
 
 };
 
-var findPlayer = function(email){		
+var updateMatch = function(matchObj, cb) {
 
-	var dfd = q.defer();
+	onConnection(function(connection) {
+
+		matches.filter({id: matchObj.id})
+
+			.replace(matchObj)
+		
+			.run(connection, function(err, result) {
+
+				var resObj = {};
+
+				if (err) {
+
+					console.log('Error from updateMatch: ', err);
+
+					resObj.error = err;
+
+				} else {
+
+					console.log('Result from updateMatch: ', result);
+
+					resObj.result = result;
+
+				};
+
+				cb(resObj);
+
+				connection.close();
+
+			});
+
+	});
+
+};
+
+var findPlayer = function(email, cb) {
+
+	var input = email;
+
+	if (input.email) {
+
+		input = input.email;
+
+	};
 
 	onConnection(function(connection){
 
-		players.filter({email: email}).run(connection, function(err, response) {
+		players.filter({email: input}).run(connection, function(err, response) {
+
+			var resObj = {};
 
 			if (err) {
 
-				dfd.reject(err);
+				resObj.error = err;
+
+				cb(resObj);
+
+				connection.close();
 
 			} else {
 
 				response.next(function(err, player) {
 
-					dfd.resolve(player);
+					console.log(player);
+
+					resObj.player = player;
+
+					cb(resObj);
+
+					connection.close();
 
 				});
 
 			};
 
-			connection.close();
-
 		});
 
 	});
-
-	return dfd.promise;
 
 };
 
@@ -155,9 +231,10 @@ var onConnection = function(cb) {
 
 module.exports = {
 
-	saveMatch: saveMatch,
+	newMatch: newMatch,
 	registerPlayer: registerPlayer,
 	getMatch: getMatch,
+	updateMatch: updateMatch,
 	findPlayer: findPlayer
 
 };

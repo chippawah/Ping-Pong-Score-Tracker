@@ -39,6 +39,8 @@ module.exports = {
 
 	comparePassword: function(input, real) {
 
+		console.log('comparePassword is running with these arguments: ', input, real);
+
 		var dfd = q.defer();
 
 		bcrypt.compare(input, real, function(err, isMatch) {

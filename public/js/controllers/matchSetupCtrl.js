@@ -1,6 +1,6 @@
 var app = angular.module('scoreKeep');
 
-app.controller('matchSetupCtrl', function($scope, matchService, playerService, primaryPlayer) {
+app.controller('matchSetupCtrl', function($scope, $location, matchService, playerService, primaryPlayer) {
 
 	$scope.primaryPlayer = primaryPlayer;
 
@@ -8,41 +8,27 @@ app.controller('matchSetupCtrl', function($scope, matchService, playerService, p
 		
 		var playerInfo = {
 
-			p1Email: $scope.primaryPlayer.email,
-			p2Email: $scope.secondaryPlayer.email,
+			p1Id: $scope.primaryPlayer.id,
+			p2Id: $scope.secondaryPlayer.id,
 			
 			p1Name: $scope.primaryPlayer.name,
 			p2Name: $scope.secondaryPlayer.name
 
-		}
+		};
 
-		matchService.configureMatch(playerInfo, $scope.matchLength);
+		matchService.configureMatch(playerInfo, $scope.matchLength)
+
+			.then(function(res) {
+
+				$location.path('/game');
+
+			});
 
 	};
 
 	$scope.matchLengthSet = function(length) {
 
 		$scope.matchLength = length;
-
-	};
-
-	$scope.login = function() {
-
-		playerService.loginPlayer($scope.email, $scope.password)
-
-			.then(function(player) {
-
-				$scope.player1Id = player._id;
-				$scope.player1Name = player.name;
-
-			}, function(err) {
-
-				console.log(err);
-
-			});
-
-		$scope.email = null;
-		$scope.password = null;
 
 	};
 

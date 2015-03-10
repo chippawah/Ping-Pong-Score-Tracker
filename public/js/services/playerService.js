@@ -65,7 +65,7 @@ app.service('playerService', function($location, $q, $http, $firebase){
 
 		var dfd = $q.defer();
 
-		socket.emit('playerLookup', {email: email}, function(response) {
+		socket.emit('find player', email, function(response) {
 
 			if (response.error) {
 
@@ -75,9 +75,9 @@ app.service('playerService', function($location, $q, $http, $firebase){
 
 			} else {
 
-				console.log('Player found: ', response.playerId);
+				console.log('Player found: ', response.player);
 
-				dfd.resolve(response.playerId);
+				dfd.resolve(response.player);
 
 			};
 

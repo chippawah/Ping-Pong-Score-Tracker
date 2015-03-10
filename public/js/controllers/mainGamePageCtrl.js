@@ -1,10 +1,16 @@
 var app = angular.module('scoreKeep');
 
-app.controller('mainGamePageCtrl', function($scope, gameService, gameId, $location, matchService, playerService, matchObj) {
+app.controller('mainGamePageCtrl', function($scope, gameService, $location, matchService, playerService, matchObj) {
 
 // Getting and setting up all the info
 
 console.log(matchObj);
+
+$scope.game = matchObj.gamesArr[matchObj.gameNumber -1].game;
+
+$scope.player1 = matchObj.gamesArr[matchObj.gameNumber -1].player1;
+
+$scope.player1 = matchObj.gamesArr[matchObj.gameNumber -1].player1;
 
 // Game Status Methods
 

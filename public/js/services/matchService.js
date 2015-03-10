@@ -2,81 +2,40 @@ var app = angular.module('scoreKeep');
 
 var socket = io.connect('http://localhost:80');
 
-app.service('matchService', function($firebase, $location, $q, $http) {
+app.service('matchService', function($location, $q, $http, gameService) {
 
 // Variables
 
-	var currentMatchId;	
-
-	var matchObj = {};
+	var currentMatch = {};
 
 // Setup Methods
 
 	var configureMatch = function(playerInfo, matchLength) {
 
-		var matchObj = {
+		var dfd = $q.defer();
 
-			player1: {
+		var matchInfo = {
 
-				name: playerInfo.p1Name,
-				email: playerInfo.p1Email,
-				wins: 0
-
-			},
-
-			player2: {
-
-				name: playerInfo.p2Name,
-				email: playerInfo.p2Email,
-				wins: 0
-
-			},
-
-			winnerEmail: 'winnerEmail',
 			matchLength: matchLength,
-			gameNumber: 1,
-
-			gamesArr: []
+			playerInfo: playerInfo
 
 		};
 
-		matchObj = gameService.addGames(matchObj, matchLength);
+		socket.emit('new match', matchInfo, function(response) {
 
-		createNewMatch(matchObj)
+			if (response.matchObj) {
 
-			.then(function(id) {
+				console.log('New match created with between ' + response.matchObj.player1.name + ' & ' + response.matchObj.player2.name);
 
-				console.log('New match created with ID: ', id);
-				
-				$location.path('/game');
+				currentMatch = response.matchObj;
 
-			}, function(err) {
-
-				console.log('Error from createNewMatch: ', err);
-
-			});
-
-	};
-
-	var createNewMatch = function(matchObj) {
-		
-		var dfd = q.defer();
-
-		socket.emit('new match', matchObj, function(id) {
-
-			if (response.matchId) {
-
-				console.log('ID from saveMatch: ', response.matchId);
-
-				currentMatchId = response.matchId;
-
-				dfd.resolve(response.matchId);
+				dfd.resolve();
 
 			} else {
 
-				console.log('Error from saveMatch: ', response.error);
+				console.log('Error from configureMatch: ', response.error);
 
-				dfd.reject(response.error);
+				dfd.reject();
 
 			};
 
@@ -90,17 +49,7 @@ app.service('matchService', function($firebase, $location, $q, $http) {
 
 	var getCurrentMatch = function() {
 
-		var dfd = q.defer();
-
-		getMatchObj(currentMatchId).then(function(matchObj) {
-
-			dfd.resolve(matchObj);
-
-		}, function(err) {
-
-			dfd.reject(err);
-
-		});
+		return currentMatch;
 
 	};
 
@@ -240,14 +189,12 @@ app.service('matchService', function($firebase, $location, $q, $http) {
 
 // Exported Service Methods
 
-	this.createNewMatch = createNewMatch;
-
 	this.updateMatch = updateMatch;
 
 	this.configureMatch = configureMatch;
 
 	this.getMatchObj = getMatchObj;
 
-	this.getMatchId = getMatchId
+	this.getCurrentMatch = getCurrentMatch;
 
 });

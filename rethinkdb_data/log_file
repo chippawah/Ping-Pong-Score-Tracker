@@ -25,3 +25,20 @@
 2015-03-08T20:42:33.788277000 1.680593s notice: Listening on addresses: 127.0.0.1, ::1
 2015-03-08T20:42:33.788281000 1.680597s notice: To fully expose RethinkDB on the network, bind to all addresses by running rethinkdb with the `--bind all` command line option.
 2015-03-08T20:42:33.788282000 1.680598s notice: Server ready, "Chips_MBP_home_xog" b7b62dee-d054-4cd1-a273-572cbf839a3a
+2015-03-09T12:05:44.546065000 38313.641393s notice: Server got SIGINT from pid 43561, uid 501; shutting down...
+2015-03-09T12:05:44.693415000 38313.788732s notice: Shutting down client connections...
+2015-03-09T12:05:44.766122000 38313.861440s notice: All client connections closed.
+2015-03-09T12:05:44.766141000 38313.861458s notice: Shutting down storage engine... (This may take a while if you had a lot of unflushed data in the writeback cache.)
+2015-03-09T12:05:45.891019000 38314.986346s notice: Storage engine shut down.
+2015-03-09T14:39:34.697635000 0.014184s notice: Running rethinkdb 1.16.2-1 (CLANG 6.0 (clang-600.0.56))...
+2015-03-09T14:39:34.736184000 0.052730s notice: Running on Darwin 14.1.0 x86_64
+2015-03-09T14:39:34.736706000 0.053251s notice: Loading data from directory /Users/CCantrell/Documents/DevMountain/Class Work/Personal Projects/Ping-Pong-Score-Tracker/rethinkdb_data
+2015-03-09T14:39:36.243385000 1.559989s info: Automatically using cache size of 100 MB
+2015-03-09T14:39:36.243394000 1.559998s warn: Cache size does not leave much memory for server and query overhead (available memory: 287 MB).
+2015-03-09T14:39:36.243400000 1.560003s warn: Cache size is very low and may impact performance.
+2015-03-09T14:39:36.244036000 1.560640s notice: Listening for intracluster connections on port 29015
+2015-03-09T14:39:36.333509000 1.650113s notice: Listening for client driver connections on port 28015
+2015-03-09T14:39:36.333586000 1.650190s notice: Listening for administrative HTTP connections on port 8080
+2015-03-09T14:39:36.333592000 1.650195s notice: Listening on addresses: 127.0.0.1, ::1
+2015-03-09T14:39:36.333593000 1.650196s notice: To fully expose RethinkDB on the network, bind to all addresses by running rethinkdb with the `--bind all` command line option.
+2015-03-09T14:39:36.333597000 1.650200s notice: Server ready, "Chips_MBP_home_xog" b7b62dee-d054-4cd1-a273-572cbf839a3a

@@ -53,12 +53,6 @@ app.config(function($routeProvider){
 
 					return playerService.getAuthedPlayer();
 
-				}, 
-
-				newMatchId: function(matchService) {
-
-					 return matchService.createNewMatch();
-
 				}
 
 			}
