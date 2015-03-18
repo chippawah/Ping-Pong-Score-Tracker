@@ -4,13 +4,13 @@ app.controller('mainGamePageCtrl', function($scope, gameService, $location, matc
 
 // Setting up all the info
 
-$scope.match = matchObj;
+	$scope.match = matchObj;
+	$scope.game = matchObj.gamesArr[matchObj.gameNumber -1].game;
+	$scope.player1 = matchObj.gamesArr[matchObj.gameNumber -1].player1;
+	$scope.player2 = matchObj.gamesArr[matchObj.gameNumber -1].player2;
 
-$scope.game = matchObj.gamesArr[matchObj.gameNumber -1].game;
-
-$scope.player1 = matchObj.gamesArr[matchObj.gameNumber -1].player1;
-
-$scope.player2 = matchObj.gamesArr[matchObj.gameNumber -1].player2;
+	$scope.player1.playerId = matchObj.player1.id;
+	$scope.player2.playerId = matchObj.player2.id;
 
 // Game Status Methods
 
@@ -33,12 +33,12 @@ $scope.player2 = matchObj.gamesArr[matchObj.gameNumber -1].player2;
 				var finishedGame = {
 
 					game: $scope.game,
-					player1: $scope.player1,
-					player2: $scope.player2
+					winner: winning,
+					loser: losing
 
 				};
 
-				gameService.endGame(finishedGame);
+				matchService.endGame(finishedGame, $scope.match);
 
 			};
 
@@ -193,6 +193,8 @@ $scope.player2 = matchObj.gamesArr[matchObj.gameNumber -1].player2;
 
 		$scope.leaderCheck();
 
+		matchService.updateMatch($scope.game, $scope.player1, $scope.player2, $scope.match);
+
 	};
 
 	$scope.undoPointStreakUpdate = function(player){
@@ -201,7 +203,7 @@ $scope.player2 = matchObj.gamesArr[matchObj.gameNumber -1].player2;
 
 			switch (player.playerId) {
 
-				case 'p1':
+				case $scope.match.player1.id:
 
 					$scope.player1.streaking = false;
 
@@ -209,7 +211,7 @@ $scope.player2 = matchObj.gamesArr[matchObj.gameNumber -1].player2;
 
 					break;
 
-				case 'p2':
+				case $scope.match.player2.id:
 
 					$scope.player2.streaking = false;
 
@@ -307,7 +309,7 @@ $scope.player2 = matchObj.gamesArr[matchObj.gameNumber -1].player2;
 
 			case 'serverSelect':
 
-				if(player.playerId === 'p1') {
+				if(player.playerId === $scope.match.player1.id) {
 
 					$scope.player1.serving = true;
 
@@ -315,7 +317,7 @@ $scope.player2 = matchObj.gamesArr[matchObj.gameNumber -1].player2;
 
 				};
 
-				if(player.playerId === 'p2') {
+				if(player.playerId === $scope.match.player2.id) {
 
 					$scope.player1.serving = false;
 
@@ -558,6 +560,8 @@ $scope.player2 = matchObj.gamesArr[matchObj.gameNumber -1].player2;
 
 		$scope.serveCountHandler();
 
+		matchService.updateMatch($scope.game, $scope.player1, $scope.player2, $scope.match);
+
 	};
 
 	$scope.fault = function() {
@@ -596,6 +600,8 @@ $scope.player2 = matchObj.gamesArr[matchObj.gameNumber -1].player2;
 				break;
 
 		};
+
+		matchService.updateMatch($scope.game, $scope.player1, $scope.player2, $scope.match);
 
 	};
 

@@ -1,19 +1,24 @@
 var app = angular.module('scoreKeep');
+var socket = io.connect('http://localhost:80');
 
-var socket = io.connect('http://localhost');
+app.service('gameService', function(matchService, $q, $location){
 
-app.service('gameService', function($firebase, $q, $location, $http){
+	var updateGame = function (gameObj, matchId) {
 
-	var endGame = function(finishedGameObj) {
+		socket.emit('update game', {gameObj: gameObj, matchId: matchId}, function(response) {
 
-		console.log('Game ended');
+			if(response.error) {
 
-		socket.emit('game end', finishedGameObj);
+				console.log('Error from updateGame: ', response.error);
 
-		$location.path('/intermission');
+			} else {
+
+				console.log('Game Updated.');
+
+			};
+
+		});
 
 	}
-
-	this.endGame = endGame;
 
 });

@@ -133,9 +133,11 @@ var getMatch = function(matchId, cb) {
 
 var updateMatch = function(matchObj, cb) {
 
+	var id = matchObj.id
+
 	onConnection(function(connection) {
 
-		matches.filter({id: matchObj.id})
+		matches.get(id)
 
 			.replace(matchObj)
 		
@@ -149,17 +151,15 @@ var updateMatch = function(matchObj, cb) {
 
 					resObj.error = err;
 
+					cb(resObj);
+
 				} else {
 
-					console.log('Result from updateMatch: ', result);
+					resObj.matchObj = matchObj;
 
-					resObj.result = result;
+					cb(resObj);
 
 				};
-
-				cb(resObj);
-
-				connection.close();
 
 			});
 

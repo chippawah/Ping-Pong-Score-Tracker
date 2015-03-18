@@ -2,7 +2,7 @@ var app = angular.module('scoreKeep');
 
 var socket = io.connect('http://localhost:80');
 
-app.service('matchService', function($location, $q, $http, gameService) {
+app.service('matchService', function($location, $q, $http) {
 
 // Variables
 
@@ -25,7 +25,7 @@ app.service('matchService', function($location, $q, $http, gameService) {
 
 			if (response.matchObj) {
 
-				console.log('New match created with between ' + response.matchObj.player1.name + ' & ' + response.matchObj.player2.name);
+				console.log('New match created: ', response.matchObj);
 
 				currentMatch = response.matchObj;
 
@@ -82,62 +82,110 @@ app.service('matchService', function($location, $q, $http, gameService) {
 
 // Save Methods
 
-	var sendMatch = function(matchObj) {
+	var updateMatch = function(gameObj, player1, player2, matchObj) {
 
-		console.log('sendMatch is runnning with this match: ', matchObj);
+		var updatedGame = {
 
-		matchObj.createdAt = Date.now();
+			game: gameObj,
+			player1: player1,
+			player2: player2
 
-		socket.emit('save match', matchObj);
+		};
 
-	};
+		matchObj.gamesArr[matchObj.gameNumber - 1] = updatedGame;
 
-	var updateMatch = function(matchObj) {
+		var updatedMatch = matchObj;
 
-		console.log('updateMatch is runnning with this match: ', matchObj);
+		console.log('updateMatch is runnning with this match: ', updatedMatch);
 
-		matchObj.updatedAt = Date.now();
+		socket.emit('update match', updatedMatch, function(response) {
 
-		socket.emit('update match', matchObj);
+			if (response.error) {
+
+				console.log('Error from updateMatch: ', response.error);
+
+			} else {
+
+				console.log('Match updated.');
+
+			};
+
+		});
 
 	};
 
 // Helper Methods
 
-	var determineWinner = function(matchObj) {
+	var endGame = function(gameObj, matchObj) {
 
-		if(matchObj.player1.wins > matchObj.player2.wins) {
+		dataUpdate(gameObj, matchObj);
 
-			matchObj.winnerEmail = matchObj.player1.email;
+		matchObj.gamesArr[gameObj.gameNumber - 1].game = gameObj;
 
-		} else if(matchObj.player2.wins > matchObj.player1.wins) {
+		matchFinishCheck(matchObj);
 
-			matchObj.winnerEmail = matchObj.player2.email;
+	};
+
+	var matchFinishCheck = function(matchObj) {
+
+		if (matchObj.gameNumber === matchObj.matchLength) {
+
+			determineWinner(matchObj);
+
+			sendMatch(matchObj, function(response) {
+
+				if (response.status === 500) {
+
+					console.log('Something went wrong on the server. Refer to those logs. Maybe add a resend feature?');
+
+					$location.path('/home');
+
+				} else {
+
+					$location.path('/finishedGames');
+
+				};
+
+			});
+
+		} else {
+
+			$location.path('/intermission');
 
 		};
 
 	};
 
-	var dataUpdate = function(matchObj, gameObj) {
+	var determineWinner = function(matchObj) {
 
-		if (gameObj.winner.name === matchObj.player1.name) {
+		if(matchObj.player1.wins > matchObj.player2.wins) {
+
+			matchObj.winnerId = matchObj.player1.id;
+
+		} else if(matchObj.player2.wins > matchObj.player1.wins) {
+
+			matchObj.winnerId = matchObj.player2.id;
+
+		};
+
+	};
+
+	var dataUpdate = function(gameObj, matchObj) {
+
+		matchObj.gameNumber++;
+
+		if (gameObj.winner.playerId === matchObj.player1.id) {
 
 			matchObj.player1.wins++;
-			gameObj.player1 = gameObj.winner;
-			gameObj.player2 = gameObj.loser;
 
-		} else if (gameObj.winner.name === matchObj.player2.name) {
+		} else if (gameObj.winner.playerId === matchObj.player2.id) {
 
 			matchObj.player2.wins++;
-			gameObj.player2 = gameObj.winner;
-			gameObj.player1 = gameObj.loser;
 
 		};
 
 		pointDataUpdate(matchObj.player1, gameObj.player1);
 		pointDataUpdate(matchObj.player2, gameObj.player2);
-
-		matchObj.$save();
 
 	};
 
@@ -149,43 +197,6 @@ app.service('matchService', function($location, $q, $http, gameService) {
 
 	};
 
-	var matchFinishCheck = function(matchObj, promiseObj) {
-
-		if (matchObj.gamesArr.length === matchObj.matchLength) {
-
-			determineWinner(matchObj);
-
-			sendMatch(matchObj)
-
-				.then(function(res) {
-
-					console.log('Match saved: ' + res);
-
-					promiseObj.resolve(function() {
-
-						$location.path('/finishedMatches');
-
-					});
-
-				}, function(err) {
-
-					console.log(err);
-
-					promiseObj.reject(err);
-
-				});
-
-		} else {
-
-			promiseObj.resolve(function() {
-
-				$location.path('/intermission');
-
-			});
-
-		};
-
-	};
 
 // Exported Service Methods
 
@@ -196,5 +207,7 @@ app.service('matchService', function($location, $q, $http, gameService) {
 	this.getMatchObj = getMatchObj;
 
 	this.getCurrentMatch = getCurrentMatch;
+
+	this.endGame = endGame;
 
 });

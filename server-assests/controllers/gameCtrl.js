@@ -37,7 +37,7 @@ var addGames = function(matchObj, matchLength) {
 				pointsServing: 0,
 				ptsDblFaulted: 0,
 				showPointData: false,
-				playerId: 'p1',
+				playerId: null,
 				leading: false,
 				streaking: false,
 				showPlayerNameForm: false
@@ -53,7 +53,7 @@ var addGames = function(matchObj, matchLength) {
 				pointsServing: 0,
 				ptsDblFaulted: 0,
 				showPointData: false,
-				playerId: 'p2',
+				playerId: null,
 				leading: false,
 				streaking: false,
 				showPlayerNameForm: false
