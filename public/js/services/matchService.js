@@ -96,8 +96,6 @@ app.service('matchService', function($location, $q, $http) {
 
 		var updatedMatch = matchObj;
 
-		console.log('updateMatch is runnning with this match: ', updatedMatch);
-
 		socket.emit('update match', updatedMatch, function(response) {
 
 			if (response.error) {
