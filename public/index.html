@@ -4,9 +4,7 @@
 		<title>Ping Pong Tracker</title>
 
 		<link rel="stylesheet" type="text/css" href="styles.css">
-
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"/>
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css"/>
+		<link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.css">
 
 	</head>
 	<body ng-controller='mainCtrl'>
@@ -62,33 +60,30 @@
 
 	    </div>
 
-	    <!-- CDNs N' Stuff -->
+	    <!-- Packagaes -->
 
-	    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.js"></script>
-		<script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
-		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.2/angular.min.js"></script>
-		<script src="https://cdn.firebase.com/js/client/2.0.4/firebase.js"></script>
-		<script src="https://cdn.firebase.com/libs/angularfire/0.9.2/angularfire.min.js"></script>
-		<script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.11/angular-route.min.js'></script>
+	    <script src="http://localhost:80/socket.io/socket.io.js"></script>
+	    <script type="text/javascript" src='/bower_components/jquery/dist/jquery.js'></script>
+		<script type="text/javascript" src='/bower_components/angular/angular.js'></script>
+		<script type="text/javascript" src="/bower_components/angular-route/angular-route.js"></script>
 
 		<!-- Services -->
 
-		<script type="text/javascript" src='js/app.js'></script>
-		<script type="text/javascript" src='js/services/gameService.js'></script>
-		<script type="text/javascript" src='js/services/playerService.js'></script>
-		<script type="text/javascript" src='js/services/finishedMatchService.js'></script>
-		<script type="text/javascript" src='js/services/matchService.js'></script>
+		<script type="text/javascript" src='app.js'></script>
+		<script type="text/javascript" src='services/gameService.js'></script>
+		<script type="text/javascript" src='services/playerService.js'></script>
+		<script type="text/javascript" src='services/finishedMatchService.js'></script>
+		<script type="text/javascript" src='services/matchService.js'></script>
 
 		<!-- Controllers -->
 
-		<script type="text/javascript" src='js/controllers/mainCtrl.js'></script>
-		<script type="text/javascript" src='js/controllers/homePageCtrl.js'></script>
-		<script type="text/javascript" src='js/controllers/mainGamePageCtrl.js'></script>
-		<script type="text/javascript" src='js/controllers/finishedMatchCtrl.js'></script>
-		<script type="text/javascript" src='js/controllers/registerCtrl.js'></script>
-		<script type="text/javascript" src='js/controllers/matchSetupCtrl.js'></script>
-		<script type="text/javascript" src='js/controllers/intermissionCtrl.js'></script>
+		<script type="text/javascript" src='components/mainCtrl.js'></script>
+		<script type="text/javascript" src='components/home/homePageCtrl.js'></script>
+		<script type="text/javascript" src='components/main-game/mainGamePageCtrl.js'></script>
+		<script type="text/javascript" src='components/finished-match/finishedMatchCtrl.js'></script>
+		<script type="text/javascript" src='components/register/registerCtrl.js'></script>
+		<script type="text/javascript" src='components/match-setup/matchSetupCtrl.js'></script>
+		<script type="text/javascript" src='components/intermission/intermissionCtrl.js'></script>
 
 	</body>
 </html>

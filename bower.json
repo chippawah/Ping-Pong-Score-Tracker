@@ -1,0 +1,13 @@
+{
+  "name": "Ping-Pong-Score-Tracker",
+  "version": "0.0.0",
+  "homepage": "https://github.com/chippawah/Ping-Pong-Score-Tracker",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
